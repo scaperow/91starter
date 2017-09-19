@@ -8,7 +8,9 @@
  * modules in your project's /lib directory.
  */
 var _ = require('lodash');
-
+var request = require('request');
+var jar = request.jar();
+var keystone = require('keystone');
 
 /**
 	Initialises the standard view locals
@@ -21,8 +23,8 @@ exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [
 		{ label: '首页', key: 'home', href: '/' },
 		{ label: '学习', key: 'learn', href: '/learn' },
-	
-		{ label: 'Blog', key: 'blog', href: '/blog' },	/*
+
+		/*{ label: 'Blog', key: 'blog', href: '/blog' },	
 		{ label: 'Gallery', key: 'gallery', href: '/gallery' },
 		{ label: 'Contact', key: 'contact', href: '/	' },
 		*/
@@ -57,4 +59,42 @@ exports.requireUser = function (req, res, next) {
 	} else {
 		next();
 	}
+};
+
+/**
+ * 
+ */
+exports.requestToCME = function (req, res, url, method, next) {
+	this.requireUser(req, res, function () {
+		var cookie = req.cookies.cme;
+
+		request({
+			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
+			headers: {
+				'Cookie': cookie,
+				'Content-Type': 'application/json; charset=utf-8'
+			},
+			method: 'GET',
+			jar: jar
+		}, function (error, response, body) {
+			var resCME = JSON.parse(body);
+			if (resCME.Success && resCME.Data) {
+				request({
+					url: url,
+					method: method || 'GET',
+					headers: {
+						'Cookie': cookie
+					}
+				}, function (error, response, body) {
+					return next(JSON.parse(body));
+				});
+
+			} else {
+				res.clearCookie('cme');
+				res.clearCookie('cme_tmp');
+				next();
+			}
+		});
+
+	});
 };

@@ -46,7 +46,7 @@ html
 				.container-fluid
 					.navbar-header
 						button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
-							span.sr-only Toggle navigation
+							span.sr-only 展开菜单
 							span.icon-bar
 							span.icon-bar
 							span.icon-bar
@@ -55,13 +55,6 @@ html
 						ul.nav.navbar-nav.navbar-left
 							each link in navLinks
 								li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
-						ul.nav.navbar-nav.navbar-right
-							if user
-								if user.canAccessKeystone
-									li: a(href='/keystone') Open Keystone
-								li: a(href='/keystone/signout') 注销
-							else
-								li: a(href='/keystone/signin') 登录
 
 		//- BODY
 		#body

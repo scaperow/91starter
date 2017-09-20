@@ -1,0 +1,17 @@
+mixin course_list(courses)
+    if courses
+        #course_list.list-group
+            +course_items(courses)
+
+        .text-center
+            button( onclick="loadMoreCourse()").btn.btn-primary 加载更多
+
+mixin course_items(courses)
+    each course in courses
+        if course
+            .list-group-item
+                h4.list-group-item-heading=course.Course_Name
+                p.list-group-item-text=course.Course_Content
+                span.badge=course.ShowAssNum
+                button(onclick="showChapter('"+course.Course_Id+"')").btn.btn-link: span.glyphicon.glyphicon-chevron-down 学习
+                div(id="course_chapter_"+course.Course_Id)

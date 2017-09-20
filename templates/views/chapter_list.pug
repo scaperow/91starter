@@ -1,0 +1,9 @@
+if chapters
+    span 请学习以下章节
+    ul.ul-group
+        each chapter in chapters
+            li.list-group-item  
+                strong.list-group-item-heading=chapter.Course_ware_name
+                span.badge=chapter.StudyState
+                br
+                button(onclick="study('"+chapter.Course_Id+"','"+chapter.Relation_Id+"')").btn.btn-primary 开始学习

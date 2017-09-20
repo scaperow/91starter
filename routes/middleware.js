@@ -61,40 +61,66 @@ exports.requireUser = function (req, res, next) {
 	}
 };
 
+exports.requireUserCME = function (req, res, next) {
+	if (req.cookies.cme) {
+		request({
+			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
+			headers: {
+				'Cookie': req.cookies.cme,
+				'Content-Type': 'application/json; charset=utf-8'
+			},
+			json: true,
+			method: 'GET',
+			jar: jar
+		}, function (error, response, body) {
+			if (body && body.Success && body.Data) {
+				next();
+			} else {
+				next('请重新登陆到华医网');
+			}
+		});
+	} else {
+		next('请登录到华医网');
+	}
+};
+
 /**
  * 
  */
 exports.requestToCME = function (req, res, url, method, next) {
-	this.requireUser(req, res, function () {
-		var cookie = req.cookies.cme;
+	request({
+		url: url,
+		method: method || 'GET',
+		json: true,
+		headers: {
+			'Cookie': req.cookies.cme
+		}
+	}, function (error, response, body) {
+		if (error) {
+			return next('服务器出现了问题');
+		}
 
-		request({
-			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
-			headers: {
-				'Cookie': cookie,
-				'Content-Type': 'application/json; charset=utf-8'
-			},
-			method: 'GET',
-			jar: jar
-		}, function (error, response, body) {
-			var resCME = JSON.parse(body);
-			if (resCME.Success && resCME.Data) {
-				request({
-					url: url,
-					method: method || 'GET',
-					headers: {
-						'Cookie': cookie
-					}
-				}, function (error, response, body) {
-					return next(JSON.parse(body));
-				});
+		if (body && body.hasOwnProperty('Success') && body.Success === false) {
+			return next(body.Message || '后台出现了问题');
+		}
 
-			} else {
-				res.clearCookie('cme');
-				res.clearCookie('cme_tmp');
-				next();
-			}
-		});
-
+		return next(null, body);
 	});
 };
+
+/**
+ * 
+ */
+exports.requestUserToCME = function (req, res, url, method, next) {
+	var self = this;
+
+	this.requireUserCME(req, res, function (error) {
+		if (error) {
+			req.flash('error', error);
+			res.redirect('login');
+		} else {
+			self.requestToCME(req, res, url, method, next);
+		}
+	});
+};
+

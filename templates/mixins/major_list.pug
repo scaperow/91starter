@@ -1,0 +1,12 @@
+mixin major_list(majors,level)
+    if majors
+        ul.nav.nav-pills.nav-stacked
+            each major in majors
+                +major_item(major,level)
+
+mixin major_item(major,level)
+    if major
+        li(role="presentation")
+            a(href="javascript:onClickLevelMajor("+major_level+",'"+major.Dept_id+"','"+major.Parent_Id+"')")=major.Dept_Name
+            ul(id='sub_major_'+major.Dept_id).nav.nav-pills.nav-stacked.sub-major-container
+                

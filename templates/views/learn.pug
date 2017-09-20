@@ -1,38 +1,29 @@
 extends ../layouts/default
+include ../mixins/major_list
+include ../mixins/course_list
+include ../mixins/title_list
+
+block head
+	script(src="/js/jquery/jquery-2.1.4.min.js")
+	script(src="/js/layer/layer.js")
+	script(src="/js/site/learn.js")
+
 
 block intro
 	.container
-		if isLoginToCME
-			.alert.alert-success 您已登录到华医网，请从以下列表中选择课程来学习，如需其他操作请登录华医网官网<br/>华医网官网地址 <a href="http://cmeapp.91huayi.com/CMEAP"> http://cmeapp.91huayi.com/CMEAP</a>
-			
-		else
-			h1 登录到华医网
-		#user
+		h4 请选择课程
 
 block content
-	.container
-		if isLoginToCME
-			.row: .col-sm-12.col-md-12
-				.list-group
-					each course in courses
-						.list-group-item
-							h4.list-group-item-heading=course.Course_Name
-							p.list-group-item-text=course.Course_Content
-							span.badge=course.ShowAssNum
-							button().btn.btn-primary  开始学习
-					
-		else
-			.row: .col-sm-8.col-md-6
-				form(method='post')
-					.form-group(class=validationErrors.name ? 'has-error' : null)
-						label 华医网账号
-						input(type='text', name='user', value=formData.user).form-control
-					.form-group(class=validationErrors.email ? 'has-error' : null)
-						label 密码
-						input(type='password', name='password').form-control
-					.form-group
-						label 验证码
-						input(type='text', name='validateCode').form-control
-						img(src="/learn/code", alt="")
-					.form-actions
-						button(type='submit').btn.btn-primary 登录
+	.container: .row
+		.col-sm-12.col-md-3
+			h2 专业分类			
+			+major_list(majors,major_level)
+	
+		.col-sm-12.col-md-8
+			h2 学分分类
+			+title_list(titles)
+
+			hr
+			
+			h2 课程列表
+			+course_list(courses,major_id)

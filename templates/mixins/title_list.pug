@@ -1,0 +1,12 @@
+mixin title_list(titles)
+    if titles
+        ul.nav.nav-pills
+            +title_items(titles)
+        
+        
+mixin title_items(titles)
+    if titles
+        each title in titles
+            li(role="presentation"): a(href="javascript:onClickTitle('"+title.Title_Id+"')")=title.Title_Name
+                div.sub-title-container
+                    ul(id="sub_title"+title.Title_Id).nav.nav-pills.sub-title

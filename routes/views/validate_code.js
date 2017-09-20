@@ -13,7 +13,6 @@ exports = module.exports = function (req, res) {
             'Cookie': req.cookies.cme_tmp
         }
     }, function (error, response, body) {
-        res.cookie('cme_tmp', jar.getCookieString(GET_VALIDATE_CODE_URL));
         res.set('Content-Type', 'image/png');
         res.send(body);
     });

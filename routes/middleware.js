@@ -92,6 +92,7 @@ exports.requestToCME = function (req, res, url, method, next) {
 		url: url,
 		method: method || 'GET',
 		json: true,
+		jar: jar,
 		headers: {
 			'Cookie': req.cookies.cme
 		}
@@ -103,6 +104,7 @@ exports.requestToCME = function (req, res, url, method, next) {
 		if (body && body.hasOwnProperty('Success') && body.Success === false) {
 			return next(body.Message || '后台出现了问题');
 		}
+
 
 		return next(null, body);
 	});

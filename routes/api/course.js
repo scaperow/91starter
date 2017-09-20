@@ -27,9 +27,12 @@ exports.study = function (req, res) {
                 json: true,
                 headers: {
                     'Cookie': req.cookies.cme,
-                    'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',
-                }
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                },
+                jar: jar,
             }, function (error, response, body) {
+                res.cookie('cme', jar.getCookieString('http://cmeapp.91huayi.com/Exam/IsShowQuestion'));
+                
                 request({
                     url: 'http://cmeapp.91huayi.com/Exam/IsExamResult?score=1',
                     method: 'GET',

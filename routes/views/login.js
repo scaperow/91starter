@@ -55,16 +55,13 @@ exports = module.exports = function (req, res) {
                 if (body && body.Success && body.Data) {
                     Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
                         if (account) {
-                            req.session.regenerate(function () {    
-
-                                req.session.account = {
-                                    id: account.id,
-                                    cookie: req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4()
-                                };
-
+                            req.session.regenerate(function () {
+                                req.session.userId = account.id;
+                                req.session.cookieme= (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
+                   
                                 res.clearCookie('cme_tmp');
                                 req.flash('success', '登录成功');
-                                res.redirect('learn');
+                                return res.redirect('learn');
                             });
                         } else {
                             req.flash('error', '您尚未注册到本系统');

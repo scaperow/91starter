@@ -64,44 +64,45 @@ exports.requireUser = function (req, res, next) {
 /**
  * 
  */
-exports.requireAccount = function(req, res, next){
-		if(req.session.account){
-			request({
-				url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
-				headers: {
-					'Cookie':req.session.account.cookie,
-					'Content-Type': 'application/json; charset=utf-8'
-				},
-				json: true,
-				method: 'GET'
-			}, function (error, response, body) {
-				if (body && body.Success && body.Data) {
-					next();
-				} else {
-					next('请重新登陆到华医网');
-				}
-			});
-			next();
-		}else{
-			next('请登录');
-		}
+exports.requireAccount = function (req, res, next) {
+	if (req.session.userId) {
+		request({
+			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
+			headers: {
+				'Cookie': req.session.cookieme,
+				'Content-Type': 'application/json; charset=utf-8'
+			},
+			json: true,
+			method: 'GET'
+		}, function (error, response, body) {
+			if (body && body.Success && body.Data) {
+				next();
+			} else {
+				next('请重新登陆到华医网');
+			}
+		});
+		next();
+	} else {
+		next('请登录');
+	}
 };
 
-exports.handlerAjaxRequireAccount = function(req, res, next){
-	if(exports.requireAccount(req, res, function(error){
-		if(error){
+exports.handlerAjaxRequireAccount = function (req, res, next) {
+	if (exports.requireAccount(req, res, function (error) {
+		if (error) {
 			res.status(401);
-		}else{
+		} else {
 			next();
 		}
 	}));
 };
 
-exports.handlerDirectRequireAccount = function(req, res, next){
-	if(exports.requireAccount(req, res, function(error){
-		if(error){
+exports.handlerDirectRequireAccount = function (req, res, next) {
+	if (exports.requireAccount(req, res, function (error) {
+		if (error) {
+			req.flash('error','请重新登录');
 			res.redirect('/login');
-		}else{
+		} else {
 			next();
 		}
 	}));
@@ -117,7 +118,7 @@ exports.requestToCME = function (req, res, url, method, next) {
 		json: true,
 		jar: jar,
 		headers: {
-			'Cookie': req.session.account.cookie
+			'Cookie': req.session.cookieme
 		}
 	}, function (error, response, body) {
 		if (error) {

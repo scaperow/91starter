@@ -44,12 +44,12 @@ exports = module.exports = function (app) {
 	app.get('/code', routes.views.validate_code);
 	app.all('/login', routes.views.login);
 
-	app.all('/learn', routes.views.learn);
-	app.get('/learn/majors/:level?/:majorId?', middleware.handlerAjaxRequireAccount, routes.views.partial.major_list);
-	app.get('/learn/courses', middleware.handlerAjaxRequireAccount, routes.views.partial.course_list);
-	app.get('/learn/course', middleware.handlerAjaxRequireAccount, routes.views.partial.course_item);
-	app.get('/learn/chapters', middleware.handlerAjaxRequireAccount, routes.views.partial.chapter_list);
-	app.get('/learn/titles', middleware.handlerAjaxRequireAccount, routes.views.partial.title_list);
+	app.all('/learn', middleware.handlerDirectRequireAccount, routes.views.learn);
+	app.get('/learn/majors/:level?/:majorId?', routes.views.partial.major_list);
+	app.get('/learn/courses', routes.views.partial.course_list);
+	app.get('/learn/course', routes.views.partial.course_item);
+	app.get('/learn/chapters', routes.views.partial.chapter_list);
+	app.get('/learn/titles', routes.views.partial.title_list);
 	app.post('/learn/exam', [middleware.handlerAjaxRequireAccount, keystone.middleware.api], routes.api.course.study);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:

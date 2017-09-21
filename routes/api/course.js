@@ -28,7 +28,7 @@ exports.study = function (req, res) {
     };
     var canStudyCourse = function (results, callback) {
         var Account = keystone.list('Account');
-        Account.model.findById(req.session.account.id).exec(function (error, account) {
+        Account.model.findById(req.session.userId).exec(function (error, account) {
             if (error) {
                 callback(error);
             } else {
@@ -65,7 +65,7 @@ exports.study = function (req, res) {
                         method: 'GET',
                         json: true,
                         headers: {
-                            'Cookie': req.session.account.cookie
+                            'Cookie': req.session.cookieme
                         }
                     }, function (error, response, body) {
                         if (error) {

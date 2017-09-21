@@ -1,4 +1,5 @@
 $(function () {
+
     var lastMajorId, lastTitleId, pageIndex = 1, pageSize = 20;
     var fetchCourse = function (loading) {
         $.get('/learn/courses', {
@@ -33,23 +34,41 @@ $(function () {
         }, 'html');
     };
 
-    window.study = function (courseId, chapterId) {
-        var loading = layer.load();
-        sessionStorage.setItem('cwid', chapterId);
-  
-        $.post('/course/study', {
-            chapterId: chapterId
-        }, function (response) {
-            if (loading) {
-                layer.close(loading);
-            }
+    window.study = function (courseId, score) {
+        var confirmId = layer.confirm('学习成功后将会从您的账户扣除' + score + '学分，是否继续学习？', {
+            btn: ['是', '否'] //按钮
+        }, function () {
+            layer.close(confirmId);
+            var tipId = layer.msg('正在学习，请稍候...', {
+                time: 0
+            });
 
-            if (response && response.success) {
-                layer.msg('恭喜你，学习成功');
-            } else {
-                layer.msg(response.message || '出现了一点问题');
-            }
-        }, 'json');
+            setTimeout(function () {
+                $.post('/learn/exam', {
+                    courseId: courseId
+                }, function (response) {
+                    layer.close(tipId);
+
+                    if (response && response.success) {
+                        layer.msg('学习成功，恭喜你可以为该课程的申请证书了');
+
+                        $.get('/learn/course', {
+                            courseId: courseId
+                        }, function (response) {
+                            $('#course_container_' + courseId).replaceWith(response);
+                        }, 'html');
+                    } else {
+                        layer.msg(response.message || '出现了一点问题', {
+                            time: 0,
+                            btn: ['好的'],
+                            yes: function (index) {
+                                layer.close(index);
+                            }
+                        });
+                    }
+                }, 'json');
+            });
+        });
     };
 
     window.loadMoreCourse = function () {
@@ -93,4 +112,15 @@ $(function () {
             }
         }, 'html');
     };
+
+
+    $.ajaxSetup({
+        error: function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status == 401) {
+                window.location.href = "/login";
+            } else {
+                layer.msg('发生了一些错误');
+            }
+        }
+    });
 });

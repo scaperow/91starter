@@ -4,14 +4,24 @@ mixin course_list(courses)
             +course_items(courses)
 
         .text-center
-            button( onclick="loadMoreCourse()").btn.btn-primary 加载更多
+            button( onclick="loadMoreCourse()").btn.btn-link 加载更多
 
 mixin course_items(courses)
     each course in courses
-        if course
-            .list-group-item
-                h4.list-group-item-heading=course.Course_Name
-                p.list-group-item-text=course.Course_Content
-                span.badge=course.ShowAssNum
-                button(onclick="showChapter('"+course.Course_Id+"')").btn.btn-link: span.glyphicon.glyphicon-chevron-down 学习
-                div(id="course_chapter_"+course.Course_Id)
+        +course_item(course)
+
+mixin course_item(course)
+    if course
+            div(id="course_container_"+course.Course_Id).list-group-item
+                span.glyphicon.glyphicon-bookmark.text-success
+                strong.list-group-item-heading=course.Course_Name
+                span(style="margin-left:6px").label.label-default=course.Score_Name
+                hr
+                .list-group-item-text
+                    p=course.Course_Content
+                    .text-right
+                        case course.Study_State
+                            when 2
+                                span.label.label-success 已学
+                            default
+                                button(onclick="study('"+course.Course_Id+"',"+course.Assign_Num+")").btn.btn-primary.btn-sm 一键学习

@@ -6,7 +6,7 @@ exports = module.exports = function (req, res) {
     var view = new keystone.View(req, res);
     var locals = res.locals;
 
-    middleware.requestUserToCME(
+    middleware.requestToCME(
         req,
         res,
         'http://cmeapp.91huayi.com/Course/GetCourseWareList?courseId=' + (req.query.courseId || ''),

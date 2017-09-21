@@ -2,10 +2,25 @@ var keystone = require('keystone');
 var request = require('request');
 var middleware = require('../middleware');
 var jar = request.jar();
-
+var _ = require('lodash');
+var uuidv4 = require('uuid/v4');
+var utils = require('keystone-utils');
+var crypto = require('crypto');
 var GET_VALIDATE_CODE_URL = 'http://cmeapp.91huayi.com/UserInfo/GetCode';
 var LOGIN_URL = 'http://cmeapp.91huayi.com/UserInfo/Login';
 
+function hash(str) {
+    // force type
+    str = '' + str;
+    // get the first half
+    str = str.substr(0, Math.round(str.length / 2));
+    // hash using sha256
+    return crypto
+        .createHmac('sha256', keystone.get('cookie secret'))
+        .update(str)
+        .digest('base64')
+        .replace(/\=+$/, '');
+}
 
 
 exports = module.exports = function (req, res) {
@@ -17,6 +32,9 @@ exports = module.exports = function (req, res) {
     locals.messages = { success: [], info: [], error: [] };
 
     view.on('post', function (next) {
+        var Account = keystone.list('Account');
+        var userNameRegExp = new RegExp('^' + utils.escapeRegExp(req.body.user) + '$', 'i');
+
         if (req.cookies.cme_tmp) {
             request({
                 url: LOGIN_URL,
@@ -35,15 +53,28 @@ exports = module.exports = function (req, res) {
                 }
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
-                    req.flash('success', '登录成功');
-                    res.cookie('cme', req.cookies.cme_tmp);
-                    res.clearCookie('cme_tmp');
-                    res.redirect('learn');
+                    Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
+                        if (account) {
+                            req.session.regenerate(function () {    
+
+                                req.session.account = {
+                                    id: account.id,
+                                    cookie: req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4()
+                                };
+
+                                res.clearCookie('cme_tmp');
+                                req.flash('success', '登录成功');
+                                res.redirect('learn');
+                            });
+                        } else {
+                            req.flash('error', '您尚未注册到本系统');
+                            next();
+                        }
+                    });
                 } else {
                     req.flash('error', body.Message || '登录失败');
+                    next();
                 }
-
-                next();
             });
         } else {
             next();

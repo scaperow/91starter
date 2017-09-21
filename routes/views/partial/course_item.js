@@ -9,14 +9,14 @@ exports = module.exports = function (req, res) {
     middleware.requestToCME(
         req,
         res,
-        'http://cmeapp.91huayi.com/Course/GetLableAll?parentid=' + (req.query.titleId || ''),
+        'http://cmeapp.91huayi.com/Course/LoadCourseDetails?courseId=' + req.query.courseId,
         'GET',
-        function (error, titles) {
+        function (error, course) {
             if (error) {
                 req.flash('error', error);
             } else {
-                locals.titles = titles;
-                view.render('title_list');
+                locals.course = course;
+                view.render('course_item');
             }
         });
 };

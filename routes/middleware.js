@@ -61,27 +61,50 @@ exports.requireUser = function (req, res, next) {
 	}
 };
 
-exports.requireUserCME = function (req, res, next) {
-	if (req.cookies.cme) {
-		request({
-			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
-			headers: {
-				'Cookie': req.cookies.cme,
-				'Content-Type': 'application/json; charset=utf-8'
-			},
-			json: true,
-			method: 'GET',
-			jar: jar
-		}, function (error, response, body) {
-			if (body && body.Success && body.Data) {
-				next();
-			} else {
-				next('请重新登陆到华医网');
-			}
-		});
-	} else {
-		next('请登录到华医网');
-	}
+/**
+ * 
+ */
+exports.requireAccount = function(req, res, next){
+		if(req.session.account){
+			request({
+				url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
+				headers: {
+					'Cookie':req.session.account.cookie,
+					'Content-Type': 'application/json; charset=utf-8'
+				},
+				json: true,
+				method: 'GET'
+			}, function (error, response, body) {
+				if (body && body.Success && body.Data) {
+					next();
+				} else {
+					next('请重新登陆到华医网');
+				}
+			});
+			next();
+		}else{
+			next('请登录');
+		}
+};
+
+exports.handlerAjaxRequireAccount = function(req, res, next){
+	if(exports.requireAccount(req, res, function(error){
+		if(error){
+			res.status(401);
+		}else{
+			next();
+		}
+	}));
+};
+
+exports.handlerDirectRequireAccount = function(req, res, next){
+	if(exports.requireAccount(req, res, function(error){
+		if(error){
+			res.redirect('/login');
+		}else{
+			next();
+		}
+	}));
 };
 
 /**
@@ -94,7 +117,7 @@ exports.requestToCME = function (req, res, url, method, next) {
 		json: true,
 		jar: jar,
 		headers: {
-			'Cookie': req.cookies.cme
+			'Cookie': req.session.account.cookie
 		}
 	}, function (error, response, body) {
 		if (error) {
@@ -110,19 +133,4 @@ exports.requestToCME = function (req, res, url, method, next) {
 	});
 };
 
-/**
- * 
- */
-exports.requestUserToCME = function (req, res, url, method, next) {
-	var self = this;
-
-	this.requireUserCME(req, res, function (error) {
-		if (error) {
-			req.flash('error', error);
-			res.redirect('login');
-		} else {
-			self.requestToCME(req, res, url, method, next);
-		}
-	});
-};
 

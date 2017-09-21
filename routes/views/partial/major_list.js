@@ -7,7 +7,7 @@ var GET_VALIDATE_CODE_URL = 'http://cmeapp.91huayi.com/UserInfo/GetCode';
 var LOGIN_URL = 'http://cmeapp.91huayi.com/UserInfo/Login';
 
 var getMajors = function (req, res, next) {
-    middleware.requestUserToCME(
+    middleware.requestToCME(
         req,
         res,
         'http://cmeapp.91huayi.com/Course/GetMajorList?level=' + (req.query.level || 2) + '&parentId=' + (req.query.majorId || ''),

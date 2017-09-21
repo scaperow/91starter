@@ -8,19 +8,19 @@ var Types = keystone.Field.Types;
 var Account = new keystone.List('Account');
 
 Account.add({
-    name: { type: Types.Name, required: true, index: true },
-    password: { type: Types.Password, initial: true, required: true },
-    balance: { type: Number, initial: true, require: true },
-    consume: { type: Number, initial: true, require: true }
+    name: { type: String, required: true, index: true },
+    password: { type: Types.Password, initial: true},
+    balance: { type: Number, initial: true, require: true }
 });
 
-// Provide access to Keystone
-Account.schema.virtual('cost').get(function () {
-    return this.consume - balance;
-});
+/**
+ * Relationships
+ */
+Account.relationship({ ref: 'StudyHistory', path: 'studyhistorys', refPath: 'account' });
+
 
 /**
  * Registration
  */
-Account.defaultColumns = 'name, balance';
+Account.defaultColumns = 'name,balance';
 Account.register();

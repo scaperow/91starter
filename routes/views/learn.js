@@ -7,7 +7,7 @@ var GET_VALIDATE_CODE_URL = 'http://cmeapp.91huayi.com/UserInfo/GetCode';
 var LOGIN_URL = 'http://cmeapp.91huayi.com/UserInfo/Login';
 
 var getMajors = function (req, res, next) {
-    middleware.requestUserToCME(
+    middleware.requestToCME(
         req,
         res,
         'http://cmeapp.91huayi.com/Course/GetMajorList?level=' + (req.query.level || 2) + '&parentId=' + (req.query.parentId || ''),
@@ -39,7 +39,7 @@ exports = module.exports = function (req, res) {
     });
 
     view.on('init', function (next) {
-        middleware.requestUserToCME(
+        middleware.requestToCME(
             req,
             res,
             'http://cmeapp.91huayi.com/Course/GetLableAll?parentid=',
@@ -56,7 +56,7 @@ exports = module.exports = function (req, res) {
     });
 
     view.on('init', function (next) {
-        middleware.requestUserToCME(
+        middleware.requestToCME(
             req,
             res,
             'http://cmeapp.91huayi.com/Course/LoadCourseList?assign_type_id=&deptid=&indexpage=1&kind=2&order_by=&pageSize=5&titleId=',

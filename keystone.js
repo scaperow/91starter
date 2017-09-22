@@ -13,6 +13,8 @@ keystone.init({
 	'name': 'starter',
 	'brand': 'starter',
 
+	'port':80,
+
 	'less': 'public',
 	'static': 'public',
 	'favicon': 'public/favicon.ico',

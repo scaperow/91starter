@@ -22,14 +22,21 @@ var keystone = require('keystone');
 exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [
 		{ label: '首页', key: 'home', href: '/' },
-		{ label: '学习', key: 'learn', href: '/learn' },
+		{ label: '开始学习', key: 'learn', href: '/learn' },
+		{ label: '余额充值', key: 'charge', href: '/charge' },
+		{ label: '使用方法', key: 'tutorial', href: '/tutorial' },
 
 		/*{ label: 'Blog', key: 'blog', href: '/blog' },	
 		{ label: 'Gallery', key: 'gallery', href: '/gallery' },
 		{ label: 'Contact', key: 'contact', href: '/	' },
 		*/
 	];
+	// user for Keystone
 	res.locals.user = req.user;
+	// account for CME
+	res.locals.account = req.session && req.session.account;
+	// account for CME
+	res.locals.userme = req.session && req.session.userme;
 	next();
 };
 
@@ -65,7 +72,7 @@ exports.requireUser = function (req, res, next) {
  * 
  */
 exports.requireAccount = function (req, res, next) {
-	if (req.session.userId) {
+	if (req.session.account) {
 		request({
 			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
 			headers: {
@@ -81,7 +88,6 @@ exports.requireAccount = function (req, res, next) {
 				next('请重新登陆到华医网');
 			}
 		});
-		next();
 	} else {
 		next('请登录');
 	}
@@ -100,7 +106,7 @@ exports.handlerAjaxRequireAccount = function (req, res, next) {
 exports.handlerDirectRequireAccount = function (req, res, next) {
 	if (exports.requireAccount(req, res, function (error) {
 		if (error) {
-			req.flash('error','请重新登录');
+			req.flash('error', '请重新登录');
 			res.redirect('/login');
 		} else {
 			next();

@@ -1,6 +1,6 @@
 mixin course_list(courses)
     if courses
-        #course_list.list-group
+        #course_list
             +course_items(courses)
 
         .text-center
@@ -12,16 +12,18 @@ mixin course_items(courses)
 
 mixin course_item(course)
     if course
-            div(id="course_container_"+course.Course_Id).list-group-item
-                span.glyphicon.glyphicon-bookmark.text-success
-                strong.list-group-item-heading=course.Course_Name
-                span(style="margin-left:6px").label.label-default=course.Score_Name
-                hr
-                .list-group-item-text
-                    p=course.Course_Content
-                    .text-right
-                        case course.Study_State
-                            when 2
-                                span.label.label-success 已学
-                            default
-                                button(onclick="study('"+course.Course_Id+"',"+course.Assign_Num+")").btn.btn-primary.btn-sm 一键学习
+            div(id="course_container_"+course.Course_Id).media
+                .media-left
+                    img(src="http://cmebg.91huayi.com/Upload/CourseImages/"+course.Img_Url).media-object.course-cover
+                .media-body
+                    .media-heading
+                        span.glyphicon.glyphicon-bookmark.text-success
+                        strong.list-group-item-heading=course.Course_Name
+                        div.label.label-default=course.Score_Name
+                    =course.Course_Content
+                .text-right
+                    case course.Study_State
+                        when 2
+                            span.label.label-success 已学
+                        default
+                            button(onclick="study('"+course.Course_Id+"',"+course.Assign_Num+")").btn.btn-primary.btn-sm 一键学习

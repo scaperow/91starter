@@ -13,7 +13,7 @@ $(function () {
             }
 
             if (!response) {
-                layer.message('没有更多了');
+                layer.msg('没有更多了');
             }
 
             $('#course_list').append(response);
@@ -35,7 +35,7 @@ $(function () {
     };
 
     window.study = function (courseId, score) {
-        var confirmId = layer.confirm('学习成功后将会从您的账户扣除' + score + '学分，是否继续学习？', {
+        var confirmId = layer.confirm('学习成功后将会从您的账户扣除 ' + score + ' 元，是否继续学习？', {
             btn: ['是', '否'] //按钮
         }, function () {
             layer.close(confirmId);
@@ -50,21 +50,19 @@ $(function () {
                     layer.close(tipId);
 
                     if (response && response.success) {
-                        layer.msg('学习成功，恭喜你可以为该课程的申请证书了');
+                        layer.alert('学习成功，恭喜你可以为该课程的申请证书了');
 
                         $.get('/learn/course', {
                             courseId: courseId
                         }, function (response) {
                             $('#course_container_' + courseId).replaceWith(response);
                         }, 'html');
+
+                        $.get('/personal', function (response) {
+                            $('.navbar-personal').replaceWith(response);
+                        }, 'html');
                     } else {
-                        layer.msg(response.message || '出现了一点问题', {
-                            time: 0,
-                            btn: ['好的'],
-                            yes: function (index) {
-                                layer.close(index);
-                            }
-                        });
+                        layer.alert(response.message || '出现了一点问题');
                     }
                 }, 'json');
             });
@@ -119,7 +117,7 @@ $(function () {
             if (jqXHR.status == 401) {
                 window.location.href = "/login";
             } else {
-                layer.msg('发生了一些错误');
+                layer.alert('发生了一些错误');
             }
         }
     });

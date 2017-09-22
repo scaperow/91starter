@@ -9,6 +9,8 @@ var crypto = require('crypto');
 var GET_VALIDATE_CODE_URL = 'http://cmeapp.91huayi.com/UserInfo/GetCode';
 var LOGIN_URL = 'http://cmeapp.91huayi.com/UserInfo/Login';
 
+var Account = keystone.list('Account');
+
 function hash(str) {
     // force type
     str = '' + str;
@@ -32,7 +34,6 @@ exports = module.exports = function (req, res) {
     locals.messages = { success: [], info: [], error: [] };
 
     view.on('post', function (next) {
-        var Account = keystone.list('Account');
         var userNameRegExp = new RegExp('^' + utils.escapeRegExp(req.body.user) + '$', 'i');
 
         if (req.cookies.cme_tmp) {
@@ -56,9 +57,9 @@ exports = module.exports = function (req, res) {
                     Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
                         if (account) {
                             req.session.regenerate(function () {
-                                req.session.userId = account.id;
-                                req.session.cookieme= (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
-                   
+                                req.session.cookieme = (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
+                                req.session.userme = body.Data;
+                                req.session.account = account;
                                 res.clearCookie('cme_tmp');
                                 req.flash('success', '登录成功');
                                 return res.redirect('learn');
@@ -84,13 +85,14 @@ exports = module.exports = function (req, res) {
             method: 'GET',
             jar: jar
         }, function (error, response, body) {
+            req.session.userme = req.session.account = req.cookieme = null;
+
             res.clearCookie('cme');
             res.cookie('cme_tmp', jar.getCookieString(GET_VALIDATE_CODE_URL));
 
             next();
         });
     });
-
 
     view.render('login');
 };

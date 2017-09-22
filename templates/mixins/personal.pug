@@ -1,0 +1,10 @@
+mixin personal(userme, account)
+    ul.nav.navbar-nav.navbar-right.navbar-personal
+        if userme && account
+            li: a=userme.name
+            li: a
+                    span 余额
+                    span.glyphicon.glyphicon-asterisk.text-warning
+                    span=account.balance+'元'
+        else
+            li: a(href="/login") 请登录

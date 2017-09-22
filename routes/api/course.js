@@ -3,8 +3,9 @@ var keystone = require('keystone');
 var request = require('request');
 var _ = require('lodash');
 var middleware = require('../middleware');
-var jar = request.jar();
 
+var Account = keystone.list('Account');
+var StudyHistory = keystone.list('StudyHistory');
 
 /**
 *
@@ -27,18 +28,20 @@ exports.study = function (req, res) {
             });
     };
     var canStudyCourse = function (results, callback) {
-        var Account = keystone.list('Account');
-        Account.model.findById(req.session.userId).exec(function (error, account) {
+        Account.model.findById(req.session.account._id).exec(function (error, account) {
             if (error) {
                 callback(error);
             } else {
+                if (account) {
+                    var assignNumber = parseInt(results.fetchCourseDetail.Assign_Num || 0);
 
-                var assignNumber = parseInt(results.fetchCourseDetail.Assign_Num || 0);
-
-                if (account.balance <= assignNumber) {
-                    callback('抱歉, 不能学习，您还需要充值' + (assignNumber - account.cost) + '学分');
+                    if (account.balance <= assignNumber) {
+                        callback('抱歉, 不能学习，您还需要充值' + (assignNumber - account.cost) + '学分');
+                    } else {
+                        callback(null, account);
+                    }
                 } else {
-                    callback(null, account);
+                    callback('您的账户存在问题');
                 }
             }
         });
@@ -94,7 +97,6 @@ exports.study = function (req, res) {
         });
     };
     var saveHistory = function (results, callback) {
-        var StudyHistory = keystone.list('StudyHistory');
         var model = StudyHistory.model({
             course: JSON.stringify(results.fetchCourseDetail),
             account: results.canStudyCourse.id,
@@ -121,6 +123,9 @@ exports.study = function (req, res) {
                     message: error || '发生了一点错误'
                 });
             } else {
+                req.session.account = results.canStudyCourse;
+                req.session.save();
+
                 res.apiResponse({
                     success: true,
                     account: _.pick(results.canStudyCourse, 'balance')

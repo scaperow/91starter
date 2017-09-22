@@ -21,7 +21,6 @@ var keystone = require('keystone');
 */
 exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [
-		{ label: '首页', key: 'home', href: '/' },
 		{ label: '开始学习', key: 'learn', href: '/learn' },
 		{ label: '余额充值', key: 'charge', href: '/charge' },
 		{ label: '使用方法', key: 'tutorial', href: '/tutorial' },

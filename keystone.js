@@ -12,9 +12,6 @@ var keystone = require('keystone');
 keystone.init({
 	'name': 'starter',
 	'brand': 'starter',
-	'host': '',
-	'port': 3000,
-
 	'less': 'public',
 	'static': 'public',
 	'favicon': 'public/favicon.ico',

@@ -87,7 +87,7 @@ exports = module.exports = function (req, res) {
             jar: jar
         }, function (error, response, body) {
             req.session.userme = req.session.account = req.cookieme = null;
-
+            res.clearCookie('keystone.uid');
             res.clearCookie('cme');
             res.cookie('cme_tmp', jar.getCookieString(GET_VALIDATE_CODE_URL));
 

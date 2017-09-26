@@ -86,9 +86,11 @@ exports = module.exports = function (req, res) {
             method: 'GET',
             jar: jar
         }, function (error, response, body) {
+            // remove keystone.js account
             req.session.userme = req.session.account = req.cookieme = null;
             res.clearCookie('keystone.uid');
             res.clearCookie('cme');
+            // and set the tmp cookie for cme
             res.cookie('cme_tmp', jar.getCookieString(GET_VALIDATE_CODE_URL));
 
             next();

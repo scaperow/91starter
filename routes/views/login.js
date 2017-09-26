@@ -11,20 +11,6 @@ var LOGIN_URL = 'http://cmeapp.91huayi.com/UserInfo/Login';
 
 var Account = keystone.list('Account');
 
-function hash(str) {
-    // force type
-    str = '' + str;
-    // get the first half
-    str = str.substr(0, Math.round(str.length / 2));
-    // hash using sha256
-    return crypto
-        .createHmac('sha256', keystone.get('cookie secret'))
-        .update(str)
-        .digest('base64')
-        .replace(/\=+$/, '');
-}
-
-
 exports = module.exports = function (req, res) {
     var view = new keystone.View(req, res);
     var locals = res.locals;

@@ -117,10 +117,10 @@ exports.study = function (req, res) {
                 canStudyCourse: ['fetchCourseDetail', canStudyCourse],
                 fechAllChapters: [fechAllChapters],
                 studyAllChapters: ['fechAllChapters', studyAllChapters],
-                takeOffBalance: req.session.user ? [] : ['canStudyCourse', 'fetchCourseDetail', takeOffBalance],
+                takeOffBalance: ['canStudyCourse', 'fetchCourseDetail', takeOffBalance],
                 saveHistory: ['fetchCourseDetail', 'canStudyCourse', saveHistory]
             };
-        } else if (!req.session.account && req.session.user) {
+        } else if (!req.session.account && req.user) {
             tasks = {
                 fetchCourseDetail: fetchCourseDetail,
                 fechAllChapters: [fechAllChapters],

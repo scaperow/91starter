@@ -49,12 +49,12 @@ exports = module.exports = function (req, res) {
                 }
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
-                    if (req.session.user) {
+                    if (req.user) {
                         next();
                     } else {
                         Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
                             if (account) {
-                                if (req.session.user) {
+                                if (req.user) {
                                     setSession(req);
                                 } else {
                                     req.session.regenerate(setSession(req));

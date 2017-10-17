@@ -25,7 +25,6 @@ exports = module.exports = function (req, res) {
             req.session.cookieme = (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
             req.session.userme = body.Data;
             req.session.account = account;
-            req.session.save();
             res.clearCookie('cme_tmp');
             req.flash('success', '登录成功');
             return res.redirect('learn');
@@ -71,6 +70,7 @@ exports = module.exports = function (req, res) {
                 }
             });
         } else {
+            req.flash('error', body.Message || '验证码异常，请刷新页面');
             next();
         }
     });

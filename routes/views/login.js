@@ -50,8 +50,7 @@ exports = module.exports = function (req, res) {
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
                     if (req.user) {
-                        setSession(req, null, body.Data);
-                        return res.redirect('learn');
+                        return setSession(req, null, body.Data);
                     } else {
                         Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
                             if (account) {

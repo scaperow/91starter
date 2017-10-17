@@ -21,6 +21,15 @@ exports = module.exports = function (req, res) {
 
     view.on('post', function (next) {
         var userNameRegExp = new RegExp('^' + utils.escapeRegExp(req.body.user) + '$', 'i');
+        var setSession = function (req) {
+            req.session.cookieme = (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
+            req.session.userme = body.Data;
+            req.session.account = account;
+            req.session.save();
+            res.clearCookie('cme_tmp');
+            req.flash('success', '登录成功');
+            return res.redirect('learn');
+        };
 
         if (req.cookies.cme_tmp) {
             request({
@@ -40,22 +49,22 @@ exports = module.exports = function (req, res) {
                 }
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
-                    Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
-                        if (account) {
-                            req.session.regenerate(function () {
-                                req.session.cookieme = (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
-                                req.session.userme = body.Data;
-                                req.session.account = account;
-                                req.session.save();
-                                res.clearCookie('cme_tmp');
-                                req.flash('success', '登录成功');
-                                return res.redirect('learn');
-                            });
-                        } else {
-                            req.flash('error', '您尚未注册到本系统');
-                            next();
-                        }
-                    });
+                    if (req.session.user) {
+                        next();
+                    } else {
+                        Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
+                            if (account) {
+                                if (req.session.user) {
+                                    setSession(req);
+                                } else {
+                                    req.session.regenerate(setSession(req));
+                                }
+                            } else {
+                                req.flash('error', '您尚未注册到本系统');
+                                next();
+                            }
+                        });
+                    }
                 } else {
                     req.flash('error', body.Message || '登录失败');
                     next();

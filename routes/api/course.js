@@ -109,14 +109,31 @@ exports.study = function (req, res) {
     };
 
     middleware.requireAccount(req, res, function () {
-        async.auto({
-            fetchCourseDetail: fetchCourseDetail,
-            canStudyCourse: ['fetchCourseDetail', canStudyCourse],
-            fechAllChapters: [fechAllChapters],
-            studyAllChapters: ['fechAllChapters', studyAllChapters],
-            takeOffBalance: ['canStudyCourse', 'fetchCourseDetail', takeOffBalance],
-            saveHistory: ['fetchCourseDetail', 'canStudyCourse', saveHistory]
-        }, function (error, results) {
+        var tasks = {};
+
+        if (req.session.account) {
+            tasks = {
+                fetchCourseDetail: fetchCourseDetail,
+                canStudyCourse: ['fetchCourseDetail', canStudyCourse],
+                fechAllChapters: [fechAllChapters],
+                studyAllChapters: ['fechAllChapters', studyAllChapters],
+                takeOffBalance: req.session.user ? [] : ['canStudyCourse', 'fetchCourseDetail', takeOffBalance],
+                saveHistory: ['fetchCourseDetail', 'canStudyCourse', saveHistory]
+            };
+        } else if (!req.session.account && req.session.user) {
+            tasks = {
+                fetchCourseDetail: fetchCourseDetail,
+                fechAllChapters: [fechAllChapters],
+                studyAllChapters: ['fechAllChapters', studyAllChapters]
+            };
+        } else {
+            return res.apiResponse({
+                success: false,
+                message: '尚未登录'
+            });
+        }
+
+        async.auto(tasks, function (error, results) {
             if (error) {
                 res.apiResponse({
                     success: false,
@@ -132,5 +149,6 @@ exports.study = function (req, res) {
                 });
             }
         });
+
     });
 };

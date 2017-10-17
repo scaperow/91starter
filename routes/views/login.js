@@ -21,9 +21,9 @@ exports = module.exports = function (req, res) {
 
     view.on('post', function (next) {
         var userNameRegExp = new RegExp('^' + utils.escapeRegExp(req.body.user) + '$', 'i');
-        var setSession = function (req) {
+        var setSession = function (req, account, cookie) {
             req.session.cookieme = (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
-            req.session.userme = body.Data;
+            req.session.userme = cookie;
             req.session.account = account;
             req.session.save();
             res.clearCookie('cme_tmp');
@@ -50,16 +50,12 @@ exports = module.exports = function (req, res) {
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
                     if (req.user) {
-                        req.flash('success', '您是超管，直接登录成功');
+                        setSession(req, null, body.Data);
                         return res.redirect('learn');
                     } else {
                         Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
                             if (account) {
-                                if (req.user) {
-                                    setSession(req);
-                                } else {
-                                    req.session.regenerate(setSession(req));
-                                }
+                                req.session.regenerate(setSession(req, account, body.Data));
                             } else {
                                 req.flash('error', '您尚未注册到本系统');
                                 next();

@@ -49,7 +49,8 @@ exports = module.exports = function (req, res) {
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
                     if (req.user) {
-                        next();
+                        req.flash('success', '您是超管，直接登录成功');
+                        return res.redirect('learn');
                     } else {
                         Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
                             if (account) {

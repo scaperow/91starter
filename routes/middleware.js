@@ -71,7 +71,9 @@ exports.requireUser = function (req, res, next) {
  * 
  */
 exports.requireAccount = function (req, res, next) {
-	if (req.session.account || req.user) {
+	console.log( req.session.cookieme);
+	console.log(req.user);
+	if (req.user||req.session.account) {
 		request({
 			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
 			headers: {

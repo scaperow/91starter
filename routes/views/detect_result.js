@@ -6,7 +6,6 @@ var _ = require('lodash');
 var uuidv4 = require('uuid/v4');
 var utils = require('keystone-utils');
 var crypto = require('crypto');
-
 var Account = keystone.list('Account');
 
 exports = module.exports = function (req, res) {
@@ -26,7 +25,7 @@ exports = module.exports = function (req, res) {
             req.session.save();
             res.clearCookie('cme_tmp');
             req.flash('success', '登录成功');
-            return res.redirect('learn');
+            return res.render('detect-result');
         };
 
         if (req.cookies.cme_tmp) {
@@ -47,18 +46,7 @@ exports = module.exports = function (req, res) {
                 }
             }, function (error, response, body) {
                 if (body && body.Success && body.Data) {
-                    if (req.user) {
-                        return setSession(req, null, body.Data);
-                    } else {
-                        Account.model.findOne({ name: userNameRegExp }).exec(function (err, account) {
-                            if (account) {
-                                req.session.regenerate(setSession(req, account, body.Data));
-                            } else {
-                                req.flash('error', '您尚未注册到本系统');
-                                next();
-                            }
-                        });
-                    }
+                    return setSession(req, null, body.Data);
                 } else {
                     req.flash('error', body.Message || '登录失败');
                     next();
@@ -69,23 +57,8 @@ exports = module.exports = function (req, res) {
             next();
         }
     });
-
-    view.on('get', function (next) {
-        request({
-            url: middleware.Url.GET_VALIDATE_CODE_URL,
-            method: 'GET',
-            jar: jar
-        }, function (error, response, body) {
-            // remove keystone.js account
-            req.session.userme = req.session.account = req.cookieme = null;
-            res.clearCookie('keystone.uid');
-            res.clearCookie('cme');
-            // and set the tmp cookie for cme
-            res.cookie('cme_tmp', jar.getCookieString(middleware.Url.GET_VALIDATE_CODE_URL));
-
-            next();
-        });
+    
+    view.render('detect-result', {
+        title: '华医网账号检测系统'
     });
-
-    view.render('login');
 };

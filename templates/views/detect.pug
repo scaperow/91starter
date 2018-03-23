@@ -1,0 +1,18 @@
+extends ../layouts/default
+
+block content
+        .container: .content: .row: .col-sm-8.col-md-6
+            h2 请登陆后检测
+            form(method='post')
+                .form-group(class=validationErrors.name ? 'has-error' : null)
+                    label 华医网账号
+                    input(type='text', name='user', value=formData.user).form-control
+                .form-group(class=validationErrors.email ? 'has-error' : null)
+                    label 登录密码
+                    input(type='password', name='password').form-control
+                .form-group
+                    label 验证码
+                    input(type='text', name='validateCode').form-control
+                    img(src="/code", alt="")
+                .form-actions
+                    button(type='submit').btn.btn-primary 检测

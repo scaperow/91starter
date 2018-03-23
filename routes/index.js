@@ -46,6 +46,8 @@ exports = module.exports = function (app) {
 
 	app.get('/code', routes.views.validate_code);
 	app.all('/login', routes.views.login);
+	app.all('/detect', routes.views.detect);
+	app.all('/detect-result', routes.views.detect_result);
 
 	app.all('/learn', middleware.handlerDirectRequireAccount, routes.views.learn);
 	app.get('/learn/majors/:level?/:majorId?', routes.views.partial.major_list);

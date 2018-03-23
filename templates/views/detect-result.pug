@@ -1,0 +1,10 @@
+extends ../layouts/default
+
+block content
+    .container: .content
+        .progress: .progress-bar.progress-bar-striped.active(role="progressbar",aria-valuenow="60",aria-valuemin="0",aria-valuemax="100",style="width: 60%;")='检测中'
+
+        .alert.alert-success
+            span="用户名密码是否正确"
+        .alert
+            span="是否绑定学习卡"

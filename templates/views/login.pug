@@ -1,12 +1,9 @@
 extends ../layouts/default
 
-
-block intro
-    .container
-        h1 登录到华医网
-
 block content
-    .container: .row: .col-sm-8.col-md-6
+    .container: .content: .row: .col-sm-8.col-md-6
+    
+        h1 登录到华医网
         form(method='post')
             .form-group(class=validationErrors.name ? 'has-error' : null)
                 label 华医网账号

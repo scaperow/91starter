@@ -48,6 +48,10 @@ exports = module.exports = function (app) {
 	app.all('/login', routes.views.login);
 	app.all('/detect', routes.views.detect);
 	app.all('/detect-result', routes.views.detect_result);
+	app.all('/detect-api/check-account', [keystone.middleware.api], routes.api.detect.checkAccount);
+	app.all('/detect-api/check-card', [keystone.middleware.api], routes.api.detect.checkAccount);
+	app.all('/detect-api/check-history-course', [keystone.middleware.api], routes.api.detect.checkCard);
+	app.all('/detect-api/check-course-score', [keystone.middleware.api], routes.api.detect.checkCourseScore);
 
 	app.all('/learn', middleware.handlerDirectRequireAccount, routes.views.learn);
 	app.get('/learn/majors/:level?/:majorId?', routes.views.partial.major_list);

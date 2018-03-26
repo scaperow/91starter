@@ -73,8 +73,8 @@ exports.requireUser = function (req, res, next) {
  * 
  */
 exports.requireAccount = function (req, res, next) {
-	console.log( req.user);
-	console.log( req.session.account);
+	console.log(req.user);
+	console.log(req.session.account);
 	if (req.user || req.session.account) {
 		request({
 			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
@@ -143,9 +143,25 @@ exports.requestToCME = function (req, res, url, method, next) {
 	});
 };
 
-exports.Url =  {
-	GET_VALIDATE_CODE_URL :'http://cmeapp.91huayi.com/UserInfo/GetCode',
-	LOGIN_URL:'http://cmeapp.91huayi.com/UserInfo/Login'
+exports.Url = {
+	// 登录时验证码的地址
+	GET_VALIDATE_CODE_URL: 'http://cmeapp.91huayi.com/UserInfo/GetCode',
+	// 登录
+	LOGIN_URL: 'http://cmeapp.91huayi.com/UserInfo/Login',
+	// 验证账户是否登录了
+	IS_LOGIN: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
+	// 获取所有学分卡
+	ALL_CARD: 'http://cmeapp.91huayi.com/Card/GetAllCard',
+	// 获取所有类目
+	LABEL_ALL: "http://cmeapp.91huayi.com/Course/GetLableAll?parentid=",
+	// 获取所有的应用
+	ALL_YING_YONG: "http://zshy.91huayi.com/m/index.html#/yingyong",
+	// 获取某一个应用
+	GET_YINGYONG: "http://zshy.91huayi.com/Project/GoProject",
+	// 获取某一年的学分情况
+	COURSE_SUMMARY:"http://app.kjpt.91huayi.com/scorestat/personScoreList.htm?startDt=2018-01-01&endDt=2018-03-26&checkState=",
+	// 查询某一年的学分达标情况
+	COURSE_STATE:""
 }
 
 

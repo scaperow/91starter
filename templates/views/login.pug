@@ -1,19 +1,23 @@
 extends ../layouts/default
 
+block js
+    script(src="/js/jquery-validator/jquery.validate.min.js")
+    script(src="/js/jquery-validator/localization/messages_zh.js")
+    script(src="/js/site/login.js")
+
 block content
-    .container: .content: .row: .col-sm-8.col-md-6
-    
-        h1 登录到华医网
-        form(method='post')
-            .form-group(class=validationErrors.name ? 'has-error' : null)
-                label 华医网账号
-                input(type='text', name='user', value=formData.user).form-control
-            .form-group(class=validationErrors.email ? 'has-error' : null)
-                label 密码
-                input(type='password', name='password').form-control
-            .form-group
-                label 验证码
-                input(type='text', name='validateCode').form-control
-                img(src="/code", alt="")
-            .form-actions
-                button(type='submit').btn.btn-primary 登录
+        .container: .content: .row: .col-sm-8.col-md-6
+            h2 登陆到华医网
+            form#login-form(method='post', novalidate="true")
+                .form-group(class=validationErrors.name ? 'has-error' : null)
+                    label(for="user") 华医网账号
+                    input(type='text', name='user',value=formData.user,required="true").form-control
+                .form-group(class=validationErrors.email ? 'has-error' : null)
+                    label(for="password") 登录密码
+                    input(type='password', name='password',required="true").form-control
+                .form-group
+                    label(for="validateCode") 验证码
+                    input(type='text', name='validateCode',required="true",minlength="6",maxlength="6").form-control
+                    img(src="/code", alt="")
+                .form-actions
+                    button(type='submit').btn.btn-primary 检测

@@ -15,9 +15,5 @@ block content
                 .form-group(class=validationErrors.email ? 'has-error' : null)
                     label(for="password") 登录密码
                     input(type='password', name='password',required="true").form-control
-                .form-group
-                    label(for="validateCode") 验证码
-                    input(type='text', name='validateCode',required="true",minlength="6",maxlength="6").form-control
-                    img(src="/code", alt="")
                 .form-actions
                     button(type='submit').btn.btn-primary 检测

@@ -49,8 +49,8 @@ exports = module.exports = function (app) {
 	app.all('/detect', routes.views.detect);
 	app.all('/detect-result', routes.views.detect_result);
 	app.all('/detect-api/check-account', [keystone.middleware.api], routes.api.detect.checkAccount);
-	app.all('/detect-api/check-card', [keystone.middleware.api], routes.api.detect.checkAccount);
-	app.all('/detect-api/check-history-course', [keystone.middleware.api], routes.api.detect.checkCard);
+	app.all('/detect-api/check-card', [keystone.middleware.api], routes.api.detect.checkCard);
+	app.all('/detect-api/check-history-course', [keystone.middleware.api], routes.api.detect.checkHistoryCourse);
 	app.all('/detect-api/check-course-score', [keystone.middleware.api], routes.api.detect.checkCourseScore);
 
 	app.all('/learn', middleware.handlerDirectRequireAccount, routes.views.learn);

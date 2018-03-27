@@ -143,6 +143,29 @@ exports.requestToCME = function (req, res, url, method, next) {
 	});
 };
 
+exports.requestToAPP = function (req, res, url, method, next) {
+	console.log("++"+req.session.cookieapp);
+	request({
+		url: url,
+		method: method || 'GET',
+		json: true,
+		headers: {
+			'Cookie': req.session.cookieapp+";"+req.session.cookieasp
+		}
+	}, function (error, response, body) {
+		if (error) {
+			return next('服务器出现了问题');
+		}
+
+		if (body && body.hasOwnProperty('Success') && body.Success === false) {
+			return next(body.Message || '后台出现了问题');
+		}
+
+
+		return next(null, body);
+	});
+};
+
 exports.Url = {
 	// 登录时验证码的地址
 	GET_VALIDATE_CODE_URL: 'http://cmeapp.91huayi.com/UserInfo/GetCode',
@@ -159,9 +182,9 @@ exports.Url = {
 	// 获取某一个应用
 	GET_YINGYONG: "http://zshy.91huayi.com/Project/GoProject",
 	// 获取某一年的学分情况
-	COURSE_SUMMARY:"http://app.kjpt.91huayi.com/scorestat/personScoreList.htm?startDt=2018-01-01&endDt=2018-03-26&checkState=",
+	COURSE_SUMMARY: "http://app.kjpt.91huayi.com/scorestat/personScoreList.htm?startDt=2018-01-01&endDt=2018-03-26&checkState=",
 	// 查询某一年的学分达标情况
-	COURSE_STATE:""
+	COURSE_STATE: ""
 }
 
 

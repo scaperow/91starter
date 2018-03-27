@@ -18,63 +18,47 @@ exports = module.exports = function (req, res) {
 
     view.on('post', function (next) {
         var userNameRegExp = new RegExp('^' + utils.escapeRegExp(req.body.user) + '$', 'i');
-        var setSession = function (req, account, cookie) {
-            req.session.cookieme = (req.cookies.cme_tmp + ';uniqueVisitorId=' + uuidv4());
-            req.session.userme = cookie;
-            req.session.account = account;
-            req.session.save();
-            res.clearCookie('cme_tmp');
-            req.flash('success', '登录成功');
-            return res.redirect('detect-result');
+        var setSession = function (req, cookie) {
+            var cookieasp = jar.getCookieString('http://zshy.91huayi.com/Account/Login');
+            req.session.cookieasp = cookieasp;
+
+            // 要进行检测，需要先访问下 app 应用页面来获取 sessionID，不让后面的接口会鉴权失败
+            request({
+                url: 'http://app.kjpt.91huayi.com/GetAppId.aspx',
+                method: 'POST',
+                headers: {
+                    'Cookie': req.session.cookieasp
+                },
+                jar: jar
+            }, function (error, response, body) {
+                req.session.cookieapp = jar.getCookieString('http://app.kjpt.91huayi.com/GetAppId.aspx');
+                req.session.save();
+                req.flash('success', '登录成功');
+
+                return res.redirect('detect-result');
+            });
         };
 
-        if (req.cookies.cme_tmp) {
-            request({
-                url: middleware.Url.LOGIN_URL,
-                method: 'POST',
-                jar: jar,
-                headers: {
-                    'Cookie': req.cookies.cme_tmp
-                },
-                json: true,
-                form: {
-                    userName: req.body.user,
-                    userPwd: req.body.password,
-                    weixinId: null,
-                    code: req.body.validateCode,
-                    isBind: true,
-                }
-            }, function (error, response, body) {
-                if (body && body.Success && body.Data) {
-                    return setSession(req, null, body.Data);
-                } else {
-                    req.flash('error', body.Message || '登录失败');
-                    next();
-                }
-            });
-        } else {
-
-            req.session.userme = req.session.account = req.cookieme = null;
-            res.clearCookie('keystone.uid');
-            res.clearCookie('cme');
-            res.redirect('detect');
-            next();
-        }
+        request({
+            url: "http://zshy.91huayi.com/Account/Login?pwd=" + req.body.password + "&username=" + req.body.user,
+            method: 'POST',
+            jar: jar,
+            json: true
+        }, function (error, response, body) {
+            if (body && body.error !== 0) {
+                req.flash('error', body.Message || '登录失败');
+                next();
+            } else {
+                return setSession(req, body.Data);
+            }
+        },'json');
     });
 
-    view.on('get', function (next) {
-        request({
-            url: middleware.Url.GET_VALIDATE_CODE_URL,
-            method: 'GET',
-            jar: jar
-        }, function (error, response, body) {
-            req.session.userme = req.session.account = req.cookieme = null;
-            res.clearCookie('keystone.uid');
-            res.clearCookie('cme');
-            res.cookie('cme_tmp', jar.getCookieString(middleware.Url.GET_VALIDATE_CODE_URL));
 
-            next();
-        });
+    view.on('get', function (next) {
+        req.session.cookieasp = null;
+        res.clearCookie('.ASPXAUTH');
+        next();
     });
 
     view.render('detect', {

@@ -11,13 +11,13 @@ var StudyHistory = keystone.list('StudyHistory');
 * 检测账户状态
 */
 exports.checkAccount = function (req, res) {
-    middleware.requestToCME(
+    middleware.requestToAPP(
         req,
         res,
-        middleware.Url.IS_LOGIN,
-        'GET',
+        "http://zshy.91huayi.com/Account/myinfo",
+        'POST',
         function (error, account) {
-            res.apiResponse(account.Data);
+            res.apiResponse(account);
         });
 };
 
@@ -25,13 +25,13 @@ exports.checkAccount = function (req, res) {
  * 检测学习卡
  */
 exports.checkCard = function (req, res) {
-    middleware.requestToCME(
+    middleware.requestToAPP(
         req,
         res,
-        middleware.Url.ALL_CARD,
+        middleware.Url.IS_LOGIN,
         'GET',
         function (error, account) {
-            res.apiResponse(account.DataList.Bind_Card);
+            res.apiResponse(account);
         });
 }
 
@@ -39,23 +39,23 @@ exports.checkCard = function (req, res) {
  * 检测往年的补修课
  */
 exports.checkHistoryCourse = function (req, res) {
-    middleware.requestToCME(
+    middleware.requestToAPP(
         req,
         res,
         middleware.Url.LABEL_ALL,
         'GET',
-        function (error, account) {
-            res.apiResponse(account.DataList.Bind_Card);
+        function (error, chapters) {
+            res.apiResponse(chapters);
         });
 }
 
 /**
  * 检测最近三年的学分是否达标
  */
-exports.checkCourseScore = function () {
+exports.checkCourseScore = function(req, res) {
     // 获取所有的年份和对应的 id
     var getYears = function (callback) {
-        middleware.requestToCME(
+        middleware.requestToAPP(
             req,
             res,
             "http://app.kjpt.91huayi.com/handler/cmeYear.ashx?rd=0.034686032458067784",
@@ -72,7 +72,7 @@ exports.checkCourseScore = function () {
     }
 
     var getScore = function (year, callback) {
-        middleware.requestToCME(
+        middleware.requestToAPP(
             req,
             res,
             "http://app.kjpt.91huayi.com/scorestat/persondabiaoList.htm?years="+year.cme_year+"&cmeyearId="+year.cme_year_id+"&cme_year_message="+year.yearmessage,

@@ -4,46 +4,56 @@ block js
     script(src="js/site/detect-result.js")
 block content
     .container: .content
-
-        .progress: .progress-bar.progress-bar-striped.active(role="progressbar",aria-valuenow="60",aria-valuemin="0",aria-valuemax="100",style="width: 60%;")='检测中'
+        .progress#total-progress: .progress-bar.progress-bar-striped.active(role="progressbar",aria-valuenow="100",aria-valuemin="0",aria-valuemax="100",style="width: 100%;")='检测中'
 
         .step1.alert.alert-info
             h4="账户检测"
-            .waiting
+            .result.warning.collapse=""
+                span.glyphicon.glyphicon-info-sign.pull-right
+            .result.success.collapse=""
+                span="用户名密码正确"
+                span.glyphicon.glyphicon-ok-sign.pull-right
+            .result.error.collapse=""
+                span="用户名密码检测失败,请重新"
+                <a href="/detect">登录</a>
+                span.glyphicon.glyphicon-remove-sign.pull-right
+            .message
                 ="等待检测"
-            .result
-                .success
-                    span="用户名密码正确"
-                    span.glyphicon.glyphicon-ok.pull-right
-                .error
-                    ="用户名密码检测失败"
             
         .step2.alert.alert-info
             h4="学习卡检测"
-            .waiting
+            .result.warning.collapse=""
+                span.glyphicon.glyphicon-info-sign.pull-right
+            .result.success.collapse=""
+                span.glyphicon.glyphicon-ok-sign
+            .result.error.collapse=""
+                span.glyphicon.glyphicon-remove-sign.pull-right
+            .message
                 ="等待检测"
-            .result
-                .success
-                    span.hidden="学习卡绑定正常"
-                    span.glyphicon.glyphicon-ok.pull-right
 
         .step3.alert.alert-info
             h4="补修课检测"
-            .waiting
+            .result.warning.collapse=""
+                span.glyphicon.glyphicon-info-sign.pull-right
+            .result.success.collapse=""
+                span.glyphicon.glyphicon-ok-sign.pull-right
+            .result.error.collapse=""
+                span.glyphicon.glyphicon-remove-sign.pull-right
+            .message
                 ="等待检测"
-            .result
-                .success
-                    span.hidden="往年的补修课情况如下："
-                    span.glyphicon.glyphicon-ok.pull-right
 
         .step4.alert.alert-info
             h4="成绩检测"
-            .waiting
+            .result.warning.collapse=""
+                span.glyphicon.glyphicon-info-sign
+            .result.success.collapse=""
+                span.glyphicon.glyphicon-ok-sign.pull-right
+            .result.error.collapse=""
+                span.glyphicon.glyphicon-remove-sign.pull-right
+            .message
                 ="等待检测"
-            .result
-                .success
-                    span.hidden="往年的补修课情况如下："
-                    span.glyphicon.glyphicon-ok.pull-right
+
+        
 
 
     .container: .content

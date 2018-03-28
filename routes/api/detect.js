@@ -96,7 +96,7 @@ exports.checkCourseScore = function (req, res) {
                 message: error
             });
         } else {
-            async.concat([years, getScore], function (error, results) {
+            async.mapSeries(years,getScore, function (error, results) {
                 if (error) {
                     res.apiResponse({
                         success: false,

@@ -73,8 +73,6 @@ exports.requireUser = function (req, res, next) {
  * 
  */
 exports.requireAccount = function (req, res, next) {
-	console.log(req.user);
-	console.log(req.session.account);
 	if (req.user || req.session.account) {
 		request({
 			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
@@ -144,13 +142,13 @@ exports.requestToCME = function (req, res, url, method, next) {
 };
 
 exports.requestToAPP = function (req, res, url, method, next) {
-	console.log("++"+req.session.cookieapp);
+	console.log("++" + req.session.cookieapp);
 	request({
 		url: url,
 		method: method || 'GET',
 		json: true,
 		headers: {
-			'Cookie': req.session.cookieapp+";"+req.session.cookieasp
+			'Cookie': req.session.cookieasp + ";" + req.session.cookieapp
 		}
 	}, function (error, response, body) {
 		if (error) {

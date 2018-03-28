@@ -52,20 +52,20 @@ exports.checkHistoryCourse = function (req, res) {
 /**
  * 检测最近三年的学分是否达标
  */
-exports.checkCourseScore = function(req, res) {
+exports.checkCourseScore = function (req, res) {
     // 获取所有的年份和对应的 id
     var getYears = function (callback) {
         middleware.requestToAPP(
             req,
             res,
-            "http://app.kjpt.91huayi.com/handler/cmeYear.ashx?rd=0.034686032458067784",
+            "http://app.kjpt.91huayi.com/handler/cmeYear.ashx",
             'GET',
             function (error, years) {
                 if (error || !years) {
                     callback(error || "没有获取到年份信息");
                 }
                 else {
-                    callback(null, years.slice(0, 2));
+                    callback(null, years.slice(0, 3));
                 }
 
             });
@@ -75,13 +75,16 @@ exports.checkCourseScore = function(req, res) {
         middleware.requestToAPP(
             req,
             res,
-            "http://app.kjpt.91huayi.com/scorestat/persondabiaoList.htm?years="+year.cme_year+"&cmeyearId="+year.cme_year_id+"&cme_year_message="+year.yearmessage,
+            "http://app.kjpt.91huayi.com/handler/persondabiaoList.ashx?kindId=1&cmeyearId=" + year.cme_year_id,
             'GET',
             function (error, scores) {
                 if (error || !scores) {
                     callback(error || '获取分数时发生了错误');
                 } else {
-                    callback(scores);
+                    callback(null, {
+                        years: year.cme_year,
+                        scores: scores
+                    });
                 }
             });
     }
@@ -93,7 +96,7 @@ exports.checkCourseScore = function(req, res) {
                 message: error
             });
         } else {
-            async.map(years, getScore, function (error, results) {
+            async.concat([years, getScore], function (error, results) {
                 if (error) {
                     res.apiResponse({
                         success: false,
@@ -108,6 +111,4 @@ exports.checkCourseScore = function(req, res) {
             });
         }
     })
-
-
 }

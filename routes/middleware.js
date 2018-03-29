@@ -142,7 +142,6 @@ exports.requestToCME = function (req, res, url, method, next) {
 };
 
 exports.requestToAPP = function (req, res, url, method, next) {
-	console.log("++" + req.session.cookieapp);
 	request({
 		url: url,
 		method: method || 'GET',

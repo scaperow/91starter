@@ -133,8 +133,8 @@ $(function () {
 
     $('#total-progress .progress-bar').text("检测中").addClass("progress-bar-striped");;
     $.when()
-        //.then(step1)
-        //.then(step2)
+        .then(step1)
+        .then(step2)
         .then(step3)
         .then(step4)
         .done(function () {

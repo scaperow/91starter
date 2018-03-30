@@ -17,27 +17,24 @@ function HttpFactory() {
 
 HttpFactory.prototype = {
     constructor: HttpFactory,
-    createManagerHttp: function (req, aspAuthoration, callback) {
+    createManagerHttp: function (req, aspAuthoration, httpCallback) {
         var request1 = function (callback) {
             request({
                 url: 'http://zshy.91huayi.com/Project/GoProject',
                 method: 'POST',
                 json: true,
-                form: {
-                    id: "8722f9e9-8f75-43c6-93a6-9addd90878ea"
+                json: {
+                    id: "7b163987-de4e-4bae-a054-2b12c8bf0d84"
                 },
                 headers: {
+                    "androidversion_xyz": 13,
+                    "appid_android": "39BF80FD3C68EED63FE07C6F44AD6102",
                     'Cookie': generatorCookie(aspAuthoration)
                 },
                 jar: jar
             }, function (error, response, body) {
-                var responseBody = JSON.parse(body);
-                if (responseBody && responseBody.error === 0) {
-                    //var aspAuthoration = jar.getCookieString('http://zshy.91huayi.com/Project/GoProject');
-                    //req.session.cookieasp = cookieasp;
-                    //req.session.save();
-
-                    callback(null, responseBody.url);
+                if (body && body.error === 0) {
+                    callback(null, body.url);
                 } else {
                     callback('发生了一点错误，请重新登录');
                 }
@@ -49,9 +46,6 @@ HttpFactory.prototype = {
             request({
                 url: tokenUrl,
                 method: 'GET',
-                headers: {
-                    'Cookie': generatorCookie(aspAuthoration)
-                },
                 jar: jar
             }, function (error, response, body) {
                 callback(null, tokenUrl);
@@ -64,61 +58,81 @@ HttpFactory.prototype = {
                 url: loginUrl,
                 method: 'GET',
                 headers: {
+                    "Cookie": aspAuthoration
+                },
+                jar: jar,
+            }, function (error, response, body) {
+                callback(null, jar.getCookieString(tokenUrl));
+            });
+        }
+
+        async.waterfall([request1, request2, request3], function (error, aspSessionID) {
+            if (error) {
+                httpCallback(error.message || '发生了一点错误');
+            } else {
+                var http = new Http(aspAuthoration, aspSessionID);
+                req.session.aspAuthoration = aspAuthoration;
+                req.session.aspSessionID = aspSessionID;
+
+                req.session.save();
+                httpCallback(null, http);
+            }
+        });
+    },
+
+    createStarterHttp: function (req, aspAuthoration, deviceID, callback) {
+        request1 = function (callback) {
+            request({
+                url: 'http://zshy.91huayi.com/Home/androidversion?version=13&appid=' + deviceID,
+                json: true,
+                method: 'GET',
+                forever: true,
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8",
+                    "androidversion_xyz": 13,
+                    "appid_android": deviceID,
                     'Cookie': generatorCookie(aspAuthoration)
                 },
                 jar: jar
             }, function (error, response, body) {
-                callback(null, jar.getCookieString(loginUrl));
+                callback(null);
             });
         }
 
-        if (req.session.managerHttp) {
-            callback(null, req.session.managerHttp);
-        } else {
-            async.waterfall([request1, request2, request3], function (error, result) {
-                if (error) {
-                    callback(error.message || '发生了一点错误');
-                } else {
-                    var http = new Http(this.aspAuthoration, result);
-                    req.session.managerHttp = http;
 
-                    req.session.save();
-                }
-            });
-        }
-    },
-
-    createStarterHttp: function (req, aspAuthoration, callback) {
-
-        var request1 = function (callback) {
+        var request2 = function (callback) {
             request({
                 url: 'http://zshy.91huayi.com/Project/GoProject',
-
                 json: true,
                 method: 'POST',
-                form: {
+                forever: true,
+                json: {
                     id: "8722f9e9-8f75-43c6-93a6-9addd90878ea"
                 },
                 headers: {
+                    "Content-Type": "application/json;charset=UTF-8",
                     "androidversion_xyz": 13,
-                    "appid_android": "39BF80FD3C68EED63FE07C6F44AD6102",
+                    "appid_android": deviceID,
                     'Cookie': generatorCookie(aspAuthoration)
                 },
                 jar: jar
             }, function (error, response, body) {
-
                 callback(null, body.url);
             });
         };
 
 
-        var request2 = function (tokenUrl, callback) {
+        var request3 = function (tokenUrl, callback) {
             request({
                 url: tokenUrl,
                 method: 'GET',
                 headers: {
                     "androidversion_xyz": 13,
-                    "appid_android": "39BF80FD3C68EED63FE07C6F44AD6102",
+                    "appid_android": deviceID,
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4",
+                    "X-Requested-With": "com.huayi.cme",
+                    "Accept-Language": "zh-CN,en-US;q=0.8"
                 },
                 jar: jar
             }, function (error, response, body) {
@@ -126,70 +140,23 @@ HttpFactory.prototype = {
             });
         }
 
-        var beforeRequest3 = function (sessionID, callback) {
-            request({
-                url: "http://cmeapp.91huayi.com/CMEAPP/scripts/js/maps/swiper.min.js.map",
-                method: 'GET',
-                headers: {
-                    'Cookie': sessionID,
-                },
-                jar: jar
-            }, function (error, response, body) {
-                callback(null, sessionID);
-            });
-        }
-
-        var request3 = function (sessionID, callback) {
-            request({
-                url: "http://cmeapp.91huayi.com/UserInfo/GetUrl",
-                method: 'GET',
-                headers: {
-                    'Cookie': sessionID,
-                    "androidversion_xyz": 13,
-                    "appid_android": "39BF80FD3C68EED63FE07C6F44AD6102",
-                },
-                jar: jar
-            }, function (error, response, body) {
-                callback(null, sessionID);
-            });
-        }
-
-        var request4 = function (sessionID, callback) {
-            request({
-                url: "http://cmeapp.91huayi.com/CMEAPP/",
-                method: 'GET',
-                headers: {
-                    'Cookie': sessionID,
-                },
-                jar: jar
-            }, function (error, response, body) {
-                callback(null, sessionID);
-            });
-        }
-
-
-        if (req.session.managerHttp) {
-            callback(null, req.session.managerHttp);
-        } else {
-            async.waterfall([request1, request2, request3, request4], function (error, result) {
+   
+            async.waterfall([request1, request2, request3], function (error, aspSessionID) {
                 if (error) {
                     callback(error.message || '发生了一点错误');
                 } else {
-                    var http = new Http(this.aspAuthoration, "ASP.NET_SessionId=axcavggo1o3c4fpp4rwbmjzv");
-                    req.session.starterHttp = http;
+                    var http = new Http(aspAuthoration, aspSessionID);
+                    req.session.aspAuthoration = aspAuthoration;
+                    req.session.aspSessionID = aspSessionID;
                     req.session.save();
 
                     callback(null, http);
                 }
             });
-        }
-
     }
 }
 
 exports.HttpFactory = HttpFactory;
-
-
 
 function Http(aspAuthoration, aspSessionID) {
     this.aspAuthoration = aspAuthoration;

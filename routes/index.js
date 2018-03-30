@@ -45,7 +45,7 @@ exports = module.exports = function (app) {
 	app.get('/tutorial', routes.views.tutorial);
 
 	app.get('/code', routes.views.validate_code);
-	app.all('/login', routes.views.login);
+	app.all('/login', routes.views.web_login);
 	app.all('/detect', routes.views.detect);
 	app.all('/detect-result', routes.views.detect_result);
 	app.all('/detect-api/check-account', [keystone.middleware.api], routes.api.detect.checkAccount);

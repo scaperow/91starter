@@ -14,8 +14,8 @@ var StudyHistory = keystone.list('StudyHistory');
 * 检测账户状态
 */
 exports.checkAccount = function (req, res) {
-    new HttpFactory().createStarterHttp(req, req.session.aspAuthoration, function (error, http) {
-        http.post(middleware.Url.IS_LOGIN, null, function (error, account) {
+    new HttpFactory().createStarterHttp(req, req.session.aspAuthoration, req.session.deviceID, function (error, http) {
+        http.post("http://cmeapp.91huayi.com/UserInfo/IsLogin", null, function (error, account) {
             if (error) {
                 res.apiResponse({
                     success: false,
@@ -35,7 +35,7 @@ exports.checkAccount = function (req, res) {
  * 检测学习卡
  */
 exports.checkCard = function (req, res) {
-    new HttpFactory().createStarterHttp(req, req.session.aspAuthoration, function (error, http) {
+    new HttpFactory().createStarterHttp(req, req.session.aspAuthoration, req.session.deviceID, function (error, http) {
         http.get(middleware.Url.IS_LOGIN, null, function (error, account) {
             if (error) {
                 res.apiResponse({
@@ -57,19 +57,26 @@ exports.checkCard = function (req, res) {
  */
 exports.checkHistoryCourse = function (req, res) {
     new HttpFactory().createManagerHttp(req, req.session.aspAuthoration, function (error, http) {
-        http.get(middleware.Url.LABEL_ALL, null, function (error, chapters) {
-            if (error) {
-                res.apiResponse({
-                    success: false,
-                    message: error
-                });
-            } else {
-                res.apiResponse({
-                    success: false,
-                    chapters: chapters
-                });
-            }
-        });
+        if (error) {
+            res.apiResponse({
+                success: false,
+                error: error || '错误'
+            });
+        } else {
+            http.get(middleware.Url.LABEL_ALL, function (error, chapters) {
+                if (error) {
+                    res.apiResponse({
+                        success: false,
+                        message: error
+                    });
+                } else {
+                    res.apiResponse({
+                        success: false,
+                        chapters: chapters
+                    });
+                }
+            });
+        }
     });
 }
 
@@ -85,21 +92,17 @@ exports.checkCourseScore = function (req, res) {
             });
         } else {
             var getScore = function (year, callback) {
-                middleware.requestToAPP(
-                    req,
-                    res,
-                    "http://app.kjpt.91huayi.com/handler/persondabiaoList.ashx?kindId=1&cmeyearId=" + year.cme_year_id,
-                    'GET',
-                    function (error, scores) {
-                        if (error || !scores) {
-                            callback(error || '获取分数时发生了错误');
-                        } else {
-                            callback(null, {
-                                years: year.cme_year,
-                                scores: scores
-                            });
-                        }
-                    });
+                http.get("http://app.kjpt.91huayi.com/handler/persondabiaoList.ashx?kindId=1&cmeyearId=" + year.cme_year_id, function (error, scores) {
+
+                    if (error || !scores) {
+                        callback(error || '获取分数时发生了错误');
+                    } else {
+                        callback(null, {
+                            years: year.cme_year,
+                            scores: scores
+                        });
+                    }
+                });
             }
 
             http.get(

@@ -32,6 +32,7 @@ exports = module.exports = function (req, res) {
                 next();
             } else {
                 var aspAuthoration = jar.getCookieString('http://zshy.91huayi.com/Account/Login');
+                req.session.deviceID = uuidv4();
                 req.session.aspAuthoration = aspAuthoration;
                 req.session.save();
 
@@ -43,7 +44,7 @@ exports = module.exports = function (req, res) {
 
 
     view.on('get', function (next) {
-        req.session.aspAuthoration = req.session.aspSessionID = null;
+        req.session.aspAuthoration = req.session.aspSessionID = req.session.deviceID = null;
         next();
     });
 

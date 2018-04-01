@@ -44,7 +44,7 @@ exports = module.exports = function (req, res) {
 
 
     view.on('get', function (next) {
-        req.session.aspAuthoration = req.session.aspSessionID = req.session.deviceID = null;
+        req.session.aspAuthoration = req.session.aspStarterSessionID =req.session.aspManagerSessionID =  req.session.deviceID = null;
         next();
     });
 

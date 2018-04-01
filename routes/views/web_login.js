@@ -35,6 +35,7 @@ exports = module.exports = function (req, res) {
                     var aspAuthoration = jar.getCookieString('http://zshy.91huayi.com/Account/Login');
                     req.session.deviceID = uuidv4();
                     req.session.aspAuthoration = aspAuthoration;
+                    req.session.isLogin = true;
                     req.session.save();
 
 
@@ -49,7 +50,10 @@ exports = module.exports = function (req, res) {
     });
 
     view.on('get', function (next) {
-        req.session.aspAuthoration = req.session.aspSessionID = req.session.deviceID = null;
+        req.session.aspAuthoration = req.session.aspStarterSessionID =req.session.aspManagerSessionID= req.session.deviceID = null;
+        req.session.isLogin = false;
+        req.session.save();
+
         next();
     });
 

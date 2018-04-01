@@ -1,20 +1,21 @@
 var keystone = require('keystone');
 var request = require('request');
 var middleware = require('../../middleware');
-var jar = request.jar();
-
-var GET_VALIDATE_CODE_URL = 'http://cmeapp.91huayi.com/UserInfo/GetCode';
-var LOGIN_URL = 'http://cmeapp.91huayi.com/UserInfo/Login';
+var Http = require('../../http').Http;
+var HttpFactory = require('../../http').HttpFactory;
 
 var getMajors = function (req, res, next) {
-    middleware.requestToCME(
-        req,
-        res,
-        'http://cmeapp.91huayi.com/Course/GetMajorList?level=' + (req.query.level || 2) + '&parentId=' + (req.query.majorId || ''),
-        'GET',
-        function (error, res) {
-            next(error, res);
-        });
+    new HttpFactory().createStarterHttp(req, req.session.aspAuthoration, req.session.deviceID,function (error, http) {
+        if (error) {
+            req.flash('error', error);
+        } else {
+            http.get('http://cmeapp.91huayi.com/Course/GetMajorList?level=' + (req.query.level || 2) + '&parentId=' + (req.query.majorId || ''),
+                function (error, res) {
+                    next(error, res);
+                }
+            );
+        }
+    });
 };
 
 

@@ -66,18 +66,26 @@ HttpFactory.prototype = {
             });
         }
 
-        async.waterfall([request1, request2, request3], function (error, aspSessionID) {
-            if (error) {
-                httpCallback(error.message || '发生了一点错误');
-            } else {
-                var http = new Http(aspAuthoration, aspSessionID);
-                req.session.aspAuthoration = aspAuthoration;
-                req.session.aspSessionID = aspSessionID;
+        if (req.session.aspAuthoration && req.session.aspManageressionID) {
+            var http = new Http(req.session.aspAuthoration, req.session.aspManageressionID);
+            req.session.save();
 
-                req.session.save();
-                httpCallback(null, http);
-            }
-        });
+            callback(null, http);
+        } else {
+            async.waterfall([request1, request2, request3], function (error, aspManageressionID) {
+                if (error) {
+                    httpCallback(error.message || '发生了一点错误');
+                } else {
+                    var http = new Http(aspAuthoration, aspManageressionID);
+                    req.session.aspAuthoration = aspAuthoration;
+                    req.session.aspManageressionID = aspManageressionID;
+
+                    req.session.save();
+                    httpCallback(null, http);
+                }
+            });
+        }
+
     },
 
     createStarterHttp: function (req, aspAuthoration, deviceID, callback) {
@@ -140,19 +148,26 @@ HttpFactory.prototype = {
             });
         }
 
-   
-            async.waterfall([request1, request2, request3], function (error, aspSessionID) {
+
+        if (req.session.aspAuthoration && req.session.aspStarterSessionID) {
+            var http = new Http(req.session.aspAuthoration, req.session.aspStarterSessionID);
+            req.session.save();
+
+            callback(null, http);
+        } else {
+            async.waterfall([request1, request2, request3], function (error, aspStarterSessionID) {
                 if (error) {
                     callback(error.message || '发生了一点错误');
                 } else {
-                    var http = new Http(aspAuthoration, aspSessionID);
+                    var http = new Http(aspAuthoration, aspStarterSessionID);
                     req.session.aspAuthoration = aspAuthoration;
-                    req.session.aspSessionID = aspSessionID;
+                    req.session.aspStarterSessionID = aspStarterSessionID;
                     req.session.save();
 
                     callback(null, http);
                 }
             });
+        }
     }
 }
 

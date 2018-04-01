@@ -1,3 +1,5 @@
+
+
 /**
  * This file contains the common middleware used by your routes.
  *
@@ -11,6 +13,8 @@ var _ = require('lodash');
 var request = require('request');
 var jar = request.jar();
 var keystone = require('keystone');
+var Http = require("./http").Http;
+var HttpFactory = require("./http").HttpFactory;
 
 /**
 	Initialises the standard view locals
@@ -73,20 +77,20 @@ exports.requireUser = function (req, res, next) {
  * 
  */
 exports.requireAccount = function (req, res, next) {
-	if (req.user || req.session.account) {
-		request({
-			url: 'http://cmeapp.91huayi.com/UserInfo/IsLogin',
-			headers: {
-				'Cookie': req.session.cookieme,
-				'Content-Type': 'application/json; charset=utf-8'
-			},
-			json: true,
-			method: 'GET'
-		}, function (error, response, body) {
-			if (body && body.Success && body.Data) {
-				next();
+	if (req.session.isLogin === true) {
+		new HttpFactory().createStarterHttp(req, req.session.aspAuthoration,req.session.deviceID, function (error, http) {
+			if (error) {
+				req.flash('error', error);
 			} else {
-				next('请重新登陆到华医网');
+				http.get('http://cmeapp.91huayi.com/UserInfo/IsLogin',
+					function (error, body) {
+						if (body && body.Success && body.Data) {
+							next();
+						} else {
+							next('请重新登陆到华医网');
+						}
+					}
+				);
 			}
 		});
 	} else {
@@ -113,54 +117,6 @@ exports.handlerDirectRequireAccount = function (req, res, next) {
 			next();
 		}
 	}));
-};
-
-/**
- * 
- */
-exports.requestToCME = function (req, res, url, method, next) {
-	request({
-		url: url,
-		method: method || 'GET',
-		json: true,
-		jar: jar,
-		headers: {
-			'Cookie': req.session.cookieme
-		}
-	}, function (error, response, body) {
-		if (error) {
-			return next('服务器出现了问题');
-		}
-
-		if (body && body.hasOwnProperty('Success') && body.Success === false) {
-			return next(body.Message || '后台出现了问题');
-		}
-
-
-		return next(null, body);
-	});
-};
-
-exports.requestToAPP = function (req, res, url, method, next) {
-	request({
-		url: url,
-		method: method || 'GET',
-		json: true,
-		headers: {
-			'Cookie': req.session.cookieasp + ";" + req.session.cookieapp
-		}
-	}, function (error, response, body) {
-		if (error) {
-			return next('服务器出现了问题');
-		}
-
-		if (body && body.hasOwnProperty('Success') && body.Success === false) {
-			return next(body.Message || '后台出现了问题');
-		}
-
-
-		return next(null, body);
-	});
 };
 
 exports.Url = {

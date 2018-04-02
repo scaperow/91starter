@@ -23,8 +23,8 @@ exports.checkAccount = function (req, res) {
                 });
             } else {
                 res.apiResponse({
-                    success: false,
-                    account: account
+                    success: true,
+                    account: account.Data
                 });
             }
         });
@@ -44,8 +44,8 @@ exports.checkCard = function (req, res) {
                 });
             } else {
                 res.apiResponse({
-                    success: false,
-                    account: account
+                    success: true,
+                    account: account.DataList
                 });
             }
         });

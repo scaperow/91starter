@@ -20,7 +20,7 @@ $(function () {
         var deferred = $.Deferred();
 
         $.get('/detect-api/check-account', function (response) {
-            if (response && response.error === 0) {
+            if (response && response.success === true) {
                 $step1
                     .addClass('alert-success')
                     .removeClass('alert-info')
@@ -134,9 +134,9 @@ $(function () {
     $('#total-progress .progress-bar').text("检测中").addClass("progress-bar-striped");
     $.when()
         .then(step1)
-        //.then(step2)
-        //.then(step3)
-        //.then(step4)
+        .then(step2)
+        .then(step3)
+        .then(step4)
         .done(function () {
         })
         .fail(function () {

@@ -1,59 +1,53 @@
 extends ../layouts/default
 
 block js
+    script(src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js")
+    script(src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js")
     script(src="js/site/detect-result.js")
 block content
-    .container: .content
-        .progress#total-progress: .progress-bar.progress-bar-striped.active(role="progressbar",aria-valuenow="100",aria-valuemin="0",aria-valuemax="100",style="width: 100%;")='检测中'
-
-        .step1.alert.alert-info
+    #app.container: .content
+        .step1
             h4="账户检测"
-            .result.warning.collapse=""
-                span.glyphicon.glyphicon-info-sign.pull-right
-            .result.success.collapse=""
-                span="用户名密码正确"
-                span.glyphicon.glyphicon-ok-sign.pull-right
-            .result.error.collapse=""
-                span="用户名密码检测失败,请重新"
-                <a href="/detect">登录</a>
-                span.glyphicon.glyphicon-remove-sign.pull-right
-            .message
-                ="等待检测"
+            .alert.alert-info(v-if="result1 === null")="正在检测请稍后"
+            .div(v-else)
+                .alert.alert-success(v-if="result1.success && result1.account")=""
+                    span="用户名密码正确"
+                    span.glyphicon.glyphicon-ok-sign.pull-right
+                .alert.alert-danger(v-else-if="!result1.success")=""
+                    span="{{result1.message}}"    
+                .alert.alert-danger(v-else)=""
+                    span="用户名密码检测失败,请重新"
+                    <a href="/detect">登录</a>
+                    span.glyphicon.glyphicon-remove-sign.pull-right
             
-        .step2.alert.alert-info
+        .step2
             h4="学习卡检测"
-            .result.warning.collapse=""
-                span.glyphicon.glyphicon-info-sign.pull-right
-            .result.success.collapse=""
-                span.glyphicon.glyphicon-ok-sign
-            .result.error.collapse=""
-                span.glyphicon.glyphicon-remove-sign.pull-right
-            .message
-                ="等待检测"
+            div(v-if="result2")
+                .alert.alert-success(v-if="result2.success && result2.card && result2.card.Bind_Card > 0")=""
+                    span="已绑定{{result2.Bind_Card}}张学习卡"
+                    span.glyphicon.glyphicon-ok-sign.pull-right
+                .alert.alert-danger(v-else-if="!result2.success")=""
+                    span="{{result2.message}}"
+                .alert.alert-danger(v-else)=""
+                    span="当前账户没有绑定学习卡"
+                    div="没有学习卡，将不能申请证书，但是不影响考试。考试通过后也可以再绑定学习卡。"
+                        span.glyphicon.glyphicon-info-sign.pull-right
+            .alert.alert-info(v-else)="正在检测请稍后"   
+      
 
-        .step3.alert.alert-info
-            h4="补修课检测"
-            .result.warning.collapse=""
-                span.glyphicon.glyphicon-info-sign.pull-right
-            .result.success.collapse=""
-                span.glyphicon.glyphicon-ok-sign.pull-right
-            .result.error.collapse=""
-                span.glyphicon.glyphicon-remove-sign.pull-right
-            .message
-                ="等待检测"
-
-        .step4.alert.alert-info
+        .step4
             h4="成绩检测"
-            .result.warning.collapse=""
-                span.glyphicon.glyphicon-info-sign
-            .result.success.collapse=""
-                span.glyphicon.glyphicon-ok-sign.pull-right
-            .result.error.collapse=""
-                span.glyphicon.glyphicon-remove-sign.pull-right
-            .message
-                ="等待检测"
-
-        
+            div(v-if="result4")
+                .alert.alert-success(v-if="result4.success && result4.scores && result4.scores.length > 0")=""
+                    div(v-if="result4" v-for="score in result4.scores")
+                        strong="{{score.years}}年考试成绩"
+                        div(v-html="score.scores[0].dabiaoResult")
+                .alert.alert-danger(v-else-if="!result4.success")
+                    span="{{result4.message}}"
+                .alert.alert-success(v-else="")
+                    span="没有历史的考试成绩"
+                    span.glyphicon.glyphicon-ok-sign.pull-right
+            .alert.alert-info(v-else)="正在检测请稍后"
 
 
     .container: .content

@@ -36,7 +36,7 @@ exports.checkAccount = function (req, res) {
  */
 exports.checkCard = function (req, res) {
     new HttpFactory().createStarterHttp(req, req.session.aspAuthoration, req.session.deviceID, function (error, http) {
-        http.get(middleware.Url.IS_LOGIN, null, function (error, account) {
+        http.get(middleware.Url.IS_LOGIN, function (error, account) {
             if (error) {
                 res.apiResponse({
                     success: false,
@@ -45,7 +45,7 @@ exports.checkCard = function (req, res) {
             } else {
                 res.apiResponse({
                     success: true,
-                    account: account.DataList
+                    card: account.DataList
                 });
             }
         });
@@ -88,7 +88,7 @@ exports.checkCourseScore = function (req, res) {
         if (error) {
             res.apiResponse({
                 success: false,
-                chapters: chapters
+                message: "后台出现错误"
             });
         } else {
             var getScore = function (year, callback) {
@@ -115,7 +115,7 @@ exports.checkCourseScore = function (req, res) {
                         });
                     }
                     else {
-                        async.mapSeries(years, getScore, function (error, results) {
+                        async.mapSeries(years.slice(0,3), getScore, function (error, results) {
                             if (error) {
                                 res.apiResponse({
                                     success: false,

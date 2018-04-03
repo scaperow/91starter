@@ -1,5 +1,97 @@
-$(function () {
+(function () {
+    var app = new Vue({
+        el: '#app',
+        data: {
+            result1: null,
+            result2: null,
+            result3: null,
+            result4: null
+        },
+        methods: {
+            step1: function () {
+                var deferred = $.Deferred();
+                axios.get('/detect-api/check-account')
+                    .then(function (response) {
+                        app.result1 = response.data;
+                        deferred.resolve();
+                    })
+                    .catch(function (error) {
+                        alert('网络错误');
+                        deferred.reject();
+                    });
 
+                return deferred;
+            },
+
+            step2: function () {
+                var deferred = $.Deferred();
+                axios.get('/detect-api/check-card')
+                    .then(function (response) {
+                        app.result2 = response.data;
+                        deferred.resolve();
+                    })
+                    .catch(function (error) {
+                        alert('网络错误');
+                        deferred.reject();
+                    });
+
+                return deferred;
+            },
+
+            step3: function () {
+                var deferred = $.Deferred();
+                axios.get('/detect-api/check-card')
+                    .then(function (response) {
+                        app.result3 = response.data;
+                        deferred.resolve();
+                    })
+                    .catch(function (error) {
+                        alert('网络错误');
+                        deferred.reject();
+                    });
+
+                return deferred;
+            },
+
+            step4: function () {
+                var deferred = $.Deferred();
+                axios.get('/detect-api/check-course-score')
+                    .then(function (response) {
+                        app.result4 = response.data;
+                        deferred.resolve();
+                    })
+                    .catch(function (error) {
+                        alert('网络错误');
+                        deferred.reject();
+                    });
+            },
+
+
+        },
+        created: function () {
+            let $this = this;
+            $.when(this.step1())
+                .done(function () {
+                    $.when()
+                        .then($this.step2)
+                        .then($this.step4)
+                        .done(function () {
+                        })
+                        .fail(function () {
+                        })
+                        .always(function () {
+                        });
+                }).fail(function () {
+                    alert('用户名密码检测失败，请重新登录');
+                });
+
+
+        }
+    });
+})();
+
+$(function () {
+    /*
     var $step1 = $('.step1');
     var $step2 = $('.step2');
     var $step3 = $('.step3');
@@ -20,7 +112,9 @@ $(function () {
         var deferred = $.Deferred();
 
         $.get('/detect-api/check-account', function (response) {
-            if (response && response.success === true) {
+            this.result1 = response;
+
+            if (response && response.success === true && response.account) {
                 $step1
                     .addClass('alert-success')
                     .removeClass('alert-info')
@@ -44,15 +138,15 @@ $(function () {
     var step2 = function () {
         var deferred = $.Deferred();
         $.get('/detect-api/check-card', function (response) {
-            if (response && response.DataList) {
-                if (response.DataList.Bind_Card > 0) {
+            if (response && response.success == true) {
+                if (response.card.Bind_Card > 0) {
                     $step2
                         .addClass('alert-success')
                         .removeClass('alert-info')
                         .find('.success')
                         .show();
 
-                    $step2.find('.message').text('当前账户绑定了' + response.DataList.Bind_Card.Bind_Card + "张学习卡");
+                    $step2.find('.message').text('当前账户绑定了' + (response.card.Bind_Card + "张学习卡"));
 
                     deferred.resolve();
                 } else {
@@ -145,4 +239,5 @@ $(function () {
         .always(function () {
             $('#total-progress .progress-bar').text("已完成").removeClass("progress-bar-striped");
         });
+        */
 });

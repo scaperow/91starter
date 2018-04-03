@@ -70,7 +70,7 @@ HttpFactory.prototype = {
             var http = new Http(req.session.aspAuthoration, req.session.aspManageressionID);
             req.session.save();
 
-            callback(null, http);
+            httpCallback(null, http);
         } else {
             async.waterfall([request1, request2, request3], function (error, aspManageressionID) {
                 if (error) {

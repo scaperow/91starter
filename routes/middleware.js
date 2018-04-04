@@ -60,6 +60,11 @@ exports.flashMessages = function (req, res, next) {
 	next();
 };
 
+exports.theme = function (req, res, next) {
+	res.locals.currentTheme = 'Lumen';
+	next();
+};
+
 
 /**
 	Prevents people from accessing protected pages when they're not signed in

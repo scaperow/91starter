@@ -6,14 +6,14 @@ block js
     script(src="/js/site/login.js")
 
 block content
-        .container: .content: .row: .col-sm-8.col-md-6
-            h2 请登陆后检测
-            form#login-form(method='post', novalidate="true")
-                .form-group(class=validationErrors.name ? 'has-error' : null)
-                    label(for="user") 华医网账号
-                    input(type='text', name='user',value=formData.user,required="true").form-control
-                .form-group(class=validationErrors.email ? 'has-error' : null)
-                    label(for="password") 登录密码
-                    input(type='password', name='password',required="true").form-control
-                .form-actions
-                    button(type='submit').btn.btn-primary 检测
+    .container: .content: .row: .col-sm-8.col-md-6
+        h2 请登陆后检测
+        form#login-form(method='post', novalidate="true")
+            .form-group(class=validationErrors.name ? 'has-error' : null)
+                label(for="user") 华医网账号
+                input(type='text', name='user',value=formData.user,required="true").form-control
+            .form-group(class=validationErrors.email ? 'has-error' : null)
+                label(for="password") 登录密码
+                input(type='password', name='password',required="true").form-control
+            .form-actions
+                button(type='submit').btn.btn-primary 检测

@@ -12,8 +12,12 @@
                 var deferred = $.Deferred();
                 axios.get('/detect-api/check-account')
                     .then(function (response) {
-                        app.result1 = response.data;
-                        deferred.resolve();
+                        if (response.data && response.data.success) {
+                            app.result1 = response.data;
+                            deferred.resolve();
+                        } else {
+                            deferred.reject();
+                        }
                     })
                     .catch(function (error) {
                         alert('网络错误');
@@ -54,10 +58,49 @@
             },
 
             step4: function () {
+                var categoryScoreRex = new RegExp(/(\w+)类学分不足(\d+)分/g);
+                var totalScorerRex = new RegExp(/总分不足(\d+)学分/g);
                 var deferred = $.Deferred();
+                var regexResult = null;
+
                 axios.get('/detect-api/check-course-score')
                     .then(function (response) {
                         app.result4 = response.data;
+                        app.result4.scores.forEach(function (score) {
+                            if (score.scores && score.scores.length > 0) {
+                                var scoreItem = score.scores[0];
+                                if (!scoreItem.score_id && !scoreItem.score_type && scoreItem.dabiaoResult.indexOf("不达标") > -1) {
+                                    // 不达标
+                                    score.isPass = false;
+                                    score.categoryReson = [];
+                                    score.totalReason = null;
+                                    regexResult = null;
+                                    while ((regexResult = categoryScoreRex.exec(score.dabiaoResult)) !== null) {
+                                        score.categoryReson.push({
+                                            title: regexResult[0],
+                                            category: regexResult[1],
+                                            score: regexResult[2]
+                                        });
+                                    }
+
+                                    regexResult = totalScorerRex.exec(score.dabiaoResult);
+                                    if (regexResult === null) {
+                                        score.totalReason = {
+                                            title: '解析时发生了错误'
+                                        }
+                                    } else {
+                                        score.totalReason = {
+                                            title: regexResult[0],
+                                            score: regexResult[1]
+                                        };
+                                    }
+
+                                } else {
+                                    // 达标
+                                    score.isPass = true;
+                                }
+                            }
+                        });
                         deferred.resolve();
                     })
                     .catch(function (error) {
@@ -70,7 +113,7 @@
         },
         created: function () {
             let $this = this;
-            $.when(this.step1())
+            this.step1()
                 .done(function () {
                     $.when()
                         .then($this.step2)
@@ -83,161 +126,10 @@
                         });
                 }).fail(function () {
                     alert('用户名密码检测失败，请重新登录');
+                    top.window.location = "/detect";
                 });
 
 
         }
     });
 })();
-
-$(function () {
-    /*
-    var $step1 = $('.step1');
-    var $step2 = $('.step2');
-    var $step3 = $('.step3');
-    var $step4 = $('.step4');
-
-    $('.alert')
-        .removeClass('alert-success alert-warning alert-danger')
-        .addClass('alert-info');
-
-    $('.result').hide();
-    $('.message').text('正在检测');
-
-    $('#total-progress').show();
-
-
-    // 用户名密码检测
-    var step1 = function () {
-        var deferred = $.Deferred();
-
-        $.get('/detect-api/check-account', function (response) {
-            this.result1 = response;
-
-            if (response && response.success === true && response.account) {
-                $step1
-                    .addClass('alert-success')
-                    .removeClass('alert-info')
-                    .find('.success').show();
-
-                deferred.resolve();
-            } else {
-                $step1
-                    .addClass('alert-danger')
-                    .removeClass('alert-info')
-                    .find('.error').show();
-
-                deferred.reject();
-            }
-        }, 'json');
-
-        return deferred;
-    }
-
-    // 学习卡检测
-    var step2 = function () {
-        var deferred = $.Deferred();
-        $.get('/detect-api/check-card', function (response) {
-            if (response && response.success == true) {
-                if (response.card.Bind_Card > 0) {
-                    $step2
-                        .addClass('alert-success')
-                        .removeClass('alert-info')
-                        .find('.success')
-                        .show();
-
-                    $step2.find('.message').text('当前账户绑定了' + (response.card.Bind_Card + "张学习卡"));
-
-                    deferred.resolve();
-                } else {
-                    $step2
-                        .addClass('alert-warning')
-                        .removeClass('alert-info')
-                        .find('.error')
-                        .show();
-
-                    $step2.find('.message').text("当前账户没有绑定学习卡");
-                    deferred.resolve();
-                }
-            } else {
-                $step2
-                    .addClass('alert-danger')
-                    .removeClass('alert-info')
-                    .find('.error').show();
-
-                deferred.reject();
-            }
-        }, 'json');
-
-        return deferred;
-    }
-
-    //  补修课检测
-    var step3 = function () {
-        var deferred = $.Deferred();
-        $.get('/detect-api/check-history-course', function (response) {
-            if (response) {
-                $step3
-                    .addClass('alert-success')
-                    .removeClass('alert-info')
-                    .find('.success')
-                    .show();
-
-                $step3.find('.message').text("sss");
-                deferred.resolve();
-            } else {
-                $step3
-                    .addClass('alert-danger')
-                    .removeClass('alert-info')
-                    .find('.error').show();
-
-                deferred.reject();
-            }
-        }, 'json');
-
-        return deferred;
-    }
-
-    // 需要多少分的检测
-    var step4 = function () {
-        var deferred = $.Deferred();
-        $.get('/detect-api/check-course-score', function (response) {
-            if (response) {
-                $step4
-                    .addClass('alert-success')
-                    .removeClass('alert-info')
-                    .find('.success')
-                    .show();
-
-                $step4.find('.message').text("3");
-                deferred.resolve();
-            } else {
-                $step4
-                    .addClass('alert-danger')
-                    .removeClass('alert-info')
-                    .find('.error').show();
-
-                deferred.reject();
-            }
-        }, 'json');
-
-        return deferred;
-    }
-
-
-    $('#total-progress .progress-bar').text("检测中").addClass("progress-bar-striped");
-    $.when()
-        .then(step1)
-        .then(step2)
-        .then(step3)
-        .then(step4)
-        .done(function () {
-        })
-        .fail(function () {
-
-        })
-        .always(function () {
-            $('#total-progress .progress-bar').text("已完成").removeClass("progress-bar-striped");
-        });
-        */
-});

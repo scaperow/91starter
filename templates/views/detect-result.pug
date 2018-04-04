@@ -12,41 +12,39 @@ block content
             .div(v-else)
                 .alert.alert-success(v-if="result1.success && result1.account")=""
                     span="用户名密码正确"
-                    span.glyphicon.glyphicon-ok-sign.pull-right
                 .alert.alert-danger(v-else-if="!result1.success")=""
                     span="{{result1.message}}"    
                 .alert.alert-danger(v-else)=""
                     span="用户名密码检测失败,请重新"
-                    <a href="/detect">登录</a>
-                    span.glyphicon.glyphicon-remove-sign.pull-right
+                    a(href="/detect")="登录"
             
         .step2
             h4="学习卡检测"
             div(v-if="result2")
                 .alert.alert-success(v-if="result2.success && result2.card && result2.card.Bind_Card > 0")=""
                     span="已绑定{{result2.Bind_Card}}张学习卡"
-                    span.glyphicon.glyphicon-ok-sign.pull-right
                 .alert.alert-danger(v-else-if="!result2.success")=""
                     span="{{result2.message}}"
                 .alert.alert-danger(v-else)=""
                     span="当前账户没有绑定学习卡"
                     div="没有学习卡，将不能申请证书，但是不影响考试。考试通过后也可以再绑定学习卡。"
-                        span.glyphicon.glyphicon-info-sign.pull-right
             .alert.alert-info(v-else)="正在检测请稍后"   
       
 
         .step4
             h4="成绩检测"
             div(v-if="result4")
-                .alert.alert-success(v-if="result4.success && result4.scores && result4.scores.length > 0")=""
-                    div(v-if="result4" v-for="score in result4.scores")
-                        strong="{{score.years}}年考试成绩"
+                div(v-if="result4.success && result4.scores && result4.scores.length > 0")=""
+                    .alert(v-if="result4" v-for="score in result4.scores" :class="{'alert-success':score.isPass,'alert-danger':!score.isPass}")
+                        strong="{{score.years}}年考试结果"
                         div(v-html="score.scores[0].dabiaoResult")
+                        div(v-if="!score.isPass")
+                            a(type='submit' href="http://id.cme.scaperow.com/cme.html" target="_blank").btn.btn-primary="购买学分"
+                            
                 .alert.alert-danger(v-else-if="!result4.success")
                     span="{{result4.message}}"
-                .alert.alert-success(v-else="")
+                .alert.alert-success(v-else="") 
                     span="没有历史的考试成绩"
-                    span.glyphicon.glyphicon-ok-sign.pull-right
             .alert.alert-info(v-else)="正在检测请稍后"
 
 

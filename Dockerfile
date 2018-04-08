@@ -1,5 +1,5 @@
 
-FROM google/nodejs-runtime
+FROM  node
 RUN npm install
 EXPOSE 3000
 CMD [ "npm", "start" ]
